@@ -9,10 +9,15 @@
     <resource-bundle>messages.MyBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.okayfine996.wasmify.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
+        <toolWindow factoryClass="com.github.okayfine996.wasmify.toolWindow.WasmToolWindowFactory" id="Wasmify"/>
+        <moduleBuilder builderClass="com.github.okayfine996.wasmify.wizard.WasmContractWizardStep" id="New_Wasm" order="first"/>
+        <framework.type implementation="com.github.okayfine996.wasmify.framework.WasmFramework"> Wasm Contract</framework.type>
+        <configurationType implementation="com.github.okayfine996.wasmify.runconfiguration.RunConfigurationType"/>
     </extensions>
 
     <applicationListeners>
         <listener class="com.github.okayfine996.wasmify.listeners.MyFrameStateListener" topic="com.intellij.ide.FrameStateListener"/>
     </applicationListeners>
+
+
 </idea-plugin>
