@@ -24,6 +24,17 @@ repositories {
 // Dependencies are managed with Gradle version catalog - read more: https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
 dependencies {
 //    implementation(libs.annotations)
+    // https://mvnrepository.com/artifact/com.squareup.okhttp/okhttp
+    implementation ("com.squareup.okhttp:okhttp:2.7.5")
+    // https://mvnrepository.com/artifact/org.web3j/crypto
+    implementation ("org.web3j:crypto:5.0.0")
+    // https://mvnrepository.com/artifact/org.bitcoinj/bitcoinj-core
+    implementation ("org.bitcoinj:bitcoinj-core:0.16.2")
+    // https://mvnrepository.com/artifact/com.alibaba/fastjson
+    implementation ("com.alibaba:fastjson:2.0.29")
+    // https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on
+    implementation ("org.bouncycastle:bcprov-jdk15on:1.70")
+
 }
 
 // Set the JVM language level used to build the project. Use Java 11 for 2020.3+, and Java 17 for 2022.2+.
@@ -39,7 +50,7 @@ intellij {
 
     // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file.
     plugins = properties("platformPlugins").map { it.split(',').map(String::trim).filter(String::isNotEmpty) }
-    plugins.set(listOf("com.intellij.java"))
+    plugins.set(listOf("com.intellij.java","org.rust.lang:0.4.179.4903-221"))
 }
 
 // Configure Gradle Changelog Plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
@@ -62,9 +73,13 @@ kover.xmlReport {
 }
 
 tasks {
+
+
+
     wrapper {
         gradleVersion = properties("gradleVersion").get()
     }
+
 
     patchPluginXml {
         version = properties("pluginVersion")

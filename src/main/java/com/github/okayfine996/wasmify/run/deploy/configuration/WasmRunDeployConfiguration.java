@@ -1,4 +1,4 @@
-package com.github.okayfine996.wasmify.runconfiguration;
+package com.github.okayfine996.wasmify.run.deploy.configuration;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.ExecutionResult;
@@ -12,17 +12,18 @@ import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.runners.ProgramRunner;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.NlsActions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class RunConfiguration extends RunConfigurationBase<RunConfigurationOption> {
-    protected RunConfiguration(@NotNull Project project, @Nullable ConfigurationFactory factory, @Nullable String name) {
+public class WasmRunDeployConfiguration extends LocatableConfigurationBase<WasmRunDeployConfigurationOption> {
+    protected WasmRunDeployConfiguration(@NotNull Project project, @Nullable ConfigurationFactory factory, @Nullable String name) {
         super(project, factory, name);
     }
 
     @Override
     public @NotNull SettingsEditor<? extends com.intellij.execution.configurations.RunConfiguration> getConfigurationEditor() {
-        return new WasmSettingsEditor();
+        return new WasmRunDeploySettingsEditor();
     }
 
     @Override
@@ -39,7 +40,6 @@ public class RunConfiguration extends RunConfigurationBase<RunConfigurationOptio
 
             @Override
             public @NotNull ExecutionResult execute(@NotNull Executor executor, @NotNull ProgramRunner<?> runner) throws ExecutionException {
-                System.out.println(runner);
                 return super.execute(executor, runner);
             }
         };
@@ -50,8 +50,8 @@ public class RunConfiguration extends RunConfigurationBase<RunConfigurationOptio
 
 
     @Override
-    protected @NotNull RunConfigurationOption getOptions() {
-        return (RunConfigurationOption)super.getOptions();
+    protected @NotNull WasmRunDeployConfigurationOption getOptions() {
+        return (WasmRunDeployConfigurationOption)super.getOptions();
     }
 
     public String getScriptName() {
@@ -61,8 +61,4 @@ public class RunConfiguration extends RunConfigurationBase<RunConfigurationOptio
     public void setScriptName(String scriptName) {
         getOptions().setScriptName(scriptName);
     }
-
-
-
-
 }

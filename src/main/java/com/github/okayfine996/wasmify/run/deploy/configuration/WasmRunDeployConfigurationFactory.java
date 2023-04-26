@@ -1,4 +1,4 @@
-package com.github.okayfine996.wasmify.runconfiguration;
+package com.github.okayfine996.wasmify.run.deploy.configuration;
 
 import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.configurations.ConfigurationType;
@@ -9,24 +9,24 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class RunConfigurationFactory extends ConfigurationFactory {
+public class WasmRunDeployConfigurationFactory extends ConfigurationFactory {
 
-    protected RunConfigurationFactory(@NotNull ConfigurationType type) {
+    protected WasmRunDeployConfigurationFactory(@NotNull ConfigurationType type) {
         super(type);
     }
 
     @Override
     public @NotNull RunConfiguration createTemplateConfiguration(@NotNull Project project) {
-        return new com.github.okayfine996.wasmify.runconfiguration.RunConfiguration(project,this,"demo");
+        return new WasmRunDeployConfiguration(project,this,"DeployWasmContract");
     }
 
     @Override
     public @NotNull @NonNls String getId() {
-        return RunConfigurationType.ID;
+        return WasmRunDeployConfigurationType.ID;
     }
 
     @Override
     public @Nullable Class<? extends BaseState> getOptionsClass() {
-        return RunConfigurationOption.class;
+        return WasmRunDeployConfigurationOption.class;
     }
 }

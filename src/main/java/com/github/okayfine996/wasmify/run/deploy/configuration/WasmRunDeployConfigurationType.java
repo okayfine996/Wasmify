@@ -1,4 +1,4 @@
-package com.github.okayfine996.wasmify.runconfiguration;
+package com.github.okayfine996.wasmify.run.deploy.configuration;
 
 import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.configurations.ConfigurationType;
@@ -9,16 +9,16 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 
-public class RunConfigurationType implements ConfigurationType {
-    static final String ID = "WasmRunConfiguration";
+public class WasmRunDeployConfigurationType implements ConfigurationType {
+    static final String ID = "WasmRunDeployConfiguration";
     @Override
     public @NotNull @Nls(capitalization = Nls.Capitalization.Title) String getDisplayName() {
-        return "Wasm";
+        return "CosmWasm";
     }
 
     @Override
     public @Nls(capitalization = Nls.Capitalization.Sentence) String getConfigurationTypeDescription() {
-        return "Wasm contract";
+        return "deploy";
     }
 
     @Override
@@ -33,6 +33,6 @@ public class RunConfigurationType implements ConfigurationType {
 
     @Override
     public ConfigurationFactory[] getConfigurationFactories() {
-        return new ConfigurationFactory[]{new RunConfigurationFactory(this)};
+        return new ConfigurationFactory[]{new WasmRunDeployConfigurationFactory(this)};
     }
 }

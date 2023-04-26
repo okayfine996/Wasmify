@@ -1,4 +1,4 @@
-package com.github.okayfine996.wasmify.runconfiguration;
+package com.github.okayfine996.wasmify.run.deploy.configuration;
 
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.options.ConfigurationException;
@@ -10,17 +10,17 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 
-public class WasmSettingsEditor extends SettingsEditor<RunConfiguration> {
+public class WasmRunDeploySettingsEditor extends SettingsEditor<WasmRunDeployConfiguration> {
     private JPanel myPanel;
     private LabeledComponent<TextFieldWithBrowseButton> myScriptName;
 
     @Override
-    protected void resetEditorFrom(@NotNull RunConfiguration s) {
+    protected void resetEditorFrom(@NotNull WasmRunDeployConfiguration s) {
         myScriptName.getComponent().setText(s.getScriptName());
     }
 
     @Override
-    protected void applyEditorTo(@NotNull RunConfiguration s) throws ConfigurationException {
+    protected void applyEditorTo(@NotNull WasmRunDeployConfiguration s) throws ConfigurationException {
         s.setScriptName(myScriptName.getComponent().getText());
     }
 
@@ -36,7 +36,7 @@ public class WasmSettingsEditor extends SettingsEditor<RunConfiguration> {
 
         myScriptName.setComponent(browseButton);
 
-//        browseButton.addBrowseFolderListener(new TextBrowseFolderListener(new FileChooserDescriptor(true,true,true,true,true,false)));
+        browseButton.addBrowseFolderListener(new TextBrowseFolderListener(new FileChooserDescriptor(true,true,true,true,true,false)));
     }
 
 }

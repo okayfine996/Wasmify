@@ -1,9 +1,10 @@
-package com.github.okayfine996.wasmify.runconfiguration;
+package com.github.okayfine996.wasmify.run.deploy.configuration;
 
+import com.intellij.execution.configurations.LocatableRunConfigurationOptions;
 import com.intellij.execution.configurations.RunConfigurationOptions;
 import com.intellij.openapi.components.StoredProperty;
 
-public class RunConfigurationOption  extends RunConfigurationOptions {
+public class WasmRunDeployConfigurationOption extends LocatableRunConfigurationOptions {
 
     private final StoredProperty<String> myScriptName = string("").provideDelegate(this, "scriptName");
 
