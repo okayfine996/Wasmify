@@ -12,8 +12,6 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow factoryClass="com.github.okayfine996.wasmify.toolWindow.WasmToolWindowFactory" id="Wasmify"/>
-        <moduleBuilder builderClass="com.github.okayfine996.wasmify.wizard.WasmContractWizardStep" id="New_Wasm"
-                       order="first"/>
         <framework.type implementation="com.github.okayfine996.wasmify.framework.WasmFramework">Wasm Contract
         </framework.type>
         <configurationType
@@ -22,7 +20,10 @@
                 implementation="com.github.okayfine996.wasmify.run.deploy.configuration.WasmDeployRuntimeConfigurationProducer"/>
         <codeInsight.lineMarkerProvider language="Rust"
                                         implementationClass="org.rust.ide.lineMarkers.RsImplsLineMarkerProvider"/>
-        <runLineMarkerContributor language="Rust"  implementationClass="com.github.okayfine996.wasmify.run.deploy.configuration.WasmDeployRunLineMarker"/>
+        <runLineMarkerContributor language="Rust"
+                                  implementationClass="com.github.okayfine996.wasmify.run.deploy.configuration.WasmDeployRunLineMarker"/>
+
+        <moduleType id="COSMOS_WASM_MODULE_TYPE" implementationClass="com.github.okayfine996.wasmify.module.CWModuleType"/>
     </extensions>
 
     <applicationListeners>
