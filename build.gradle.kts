@@ -27,14 +27,23 @@ dependencies {
     // https://mvnrepository.com/artifact/com.squareup.okhttp/okhttp
     implementation ("com.squareup.okhttp:okhttp:2.7.5")
     // https://mvnrepository.com/artifact/org.web3j/crypto
-    implementation ("org.web3j:crypto:5.0.0")
+    implementation ("org.web3j:crypto:5.0.0") {
+        exclude(group="org.slf4j",module="slf4j-api")
+    }
     // https://mvnrepository.com/artifact/org.bitcoinj/bitcoinj-core
-    implementation ("org.bitcoinj:bitcoinj-core:0.16.2")
+    implementation ("org.bitcoinj:bitcoinj-core:0.16.2") {
+        exclude(group="org.slf4j",module="slf4j-api")
+    }
     // https://mvnrepository.com/artifact/com.alibaba/fastjson
     implementation ("com.alibaba:fastjson:2.0.29")
     // https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on
     implementation ("org.bouncycastle:bcprov-jdk15on:1.70")
+    implementation("org.projectlombok:lombok:1.18.26")
 
+}
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
 
 // Set the JVM language level used to build the project. Use Java 11 for 2020.3+, and Java 17 for 2022.2+.

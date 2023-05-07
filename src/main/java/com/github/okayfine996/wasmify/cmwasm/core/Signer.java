@@ -10,8 +10,7 @@ import com.github.okayfine996.wasmify.cmwasm.wasm.msg.BaseMsg;
 import groovy.util.logging.Slf4j;
 import org.bouncycastle.util.Strings;
 import org.bouncycastle.util.encoders.Base64;
-import org.bouncycastle.util.encoders.Hex;
-import org.web3j.crypto.ECKeyPair;
+import org.bouncycastle.util.encoders.Hex;import org.web3j.crypto.ECKeyPair;
 import org.web3j.crypto.Sign;
 
 import java.math.BigInteger;
@@ -25,7 +24,6 @@ import java.util.List;
 public class Signer {
 
     private String chainId;
-
     protected String accountNum;
     protected PrivateKey privateKey;
 
@@ -52,7 +50,7 @@ public class Signer {
     private StdTx buildUnsignedTx(BaseMsg msg, String feeAmount, String gas, String memo, String nonce) {
         Fee fee = new Fee();
         List<Token> amountList = new ArrayList<>();
-        Token token = new Token(Utils.NewDecString(feeAmount), "okt");
+        Token token = new Token(Utils.NewDecString(feeAmount), "okb");
         amountList.add(token);
         fee.setAmount(amountList);
         fee.setGas(gas);

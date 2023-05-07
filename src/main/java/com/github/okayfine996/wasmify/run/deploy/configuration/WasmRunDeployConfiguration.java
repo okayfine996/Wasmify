@@ -32,7 +32,8 @@ public class WasmRunDeployConfiguration extends LocatableConfigurationBase<WasmR
             @NotNull
             @Override
             protected ProcessHandler startProcess() throws ExecutionException {
-                GeneralCommandLine commandLine = new GeneralCommandLine(getOptions().getScriptName());
+                GeneralCommandLine commandLine = new GeneralCommandLine("cargo","wasm","--lib");
+                commandLine.setWorkDirectory(environment.getProject().getBasePath());
                 OSProcessHandler processHandler = ProcessHandlerFactory.getInstance().createColoredProcessHandler(commandLine);
                 ProcessTerminatedListener.attach(processHandler);
                 return processHandler;
@@ -52,13 +53,5 @@ public class WasmRunDeployConfiguration extends LocatableConfigurationBase<WasmR
     @Override
     protected @NotNull WasmRunDeployConfigurationOption getOptions() {
         return (WasmRunDeployConfigurationOption)super.getOptions();
-    }
-
-    public String getScriptName() {
-        return getOptions().getScriptName();
-    }
-
-    public void setScriptName(String scriptName) {
-        getOptions().setScriptName(scriptName);
     }
 }

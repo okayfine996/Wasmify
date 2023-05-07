@@ -4,14 +4,30 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.github.okayfine996.wasmify.MyBundle
+import com.github.okayfine996.wasmify.cmwasm.wasm.WasmClient
+import com.github.okayfine996.wasmify.model.Network
+import java.util.concurrent.ConcurrentHashMap
 
-@Service(Service.Level.PROJECT)
+@Service(Service.Level.APP)
 class MyProjectService(project: Project) {
+
+    var networksMap = ConcurrentHashMap<String, Network>()
 
     init {
         thisLogger().info(MyBundle.message("projectService", project.name))
         thisLogger().warn("Don't forget to remove all non-needed sample code files with their corresponding registration entries in `plugin.xml`.")
+        networksMap.put("okb-local", Network("okb-local", "okbchain-67","okb","http://localhost:8545","block"))
     }
 
     fun getRandomNumber() = (1..100).random()
+
+    fun deployWasmContract(network: String, wasmFile: String, account: String, initMsg: String): String? {
+        var network = networksMap.get(network)
+        if (network == null) {
+            return null
+        }
+
+        var wasmClient = WasmClient(network.url,network.chainId,network.txMode)
+        return wasmClient.deployWasmContract(account,wasmFile,initMsg);
+    }
 }

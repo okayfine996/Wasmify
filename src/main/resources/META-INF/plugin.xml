@@ -23,11 +23,28 @@
         <runLineMarkerContributor language="Rust"
                                   implementationClass="com.github.okayfine996.wasmify.run.deploy.configuration.WasmDeployRunLineMarker"/>
 
-        <moduleType id="COSMOS_WASM_MODULE_TYPE" implementationClass="com.github.okayfine996.wasmify.module.CWModuleType"/>
+        <moduleType id="COSMOS_WASM_MODULE_TYPE"
+                    implementationClass="com.github.okayfine996.wasmify.module.CWModuleType"/>
+        <stepsBeforeRunProvider
+                implementation="com.github.okayfine996.wasmify.run.build.configuration.WasmBuildTaskProvider"/>
+
+        <applicationService serviceImplementation="com.github.okayfine996.wasmify.service.WasmService"/>
     </extensions>
 
     <applicationListeners>
         <listener class="com.github.okayfine996.wasmify.listeners.MyFrameStateListener"
                   topic="com.intellij.ide.FrameStateListener"/>
     </applicationListeners>
+
+    <projectListeners>
+        <listener class="com.github.okayfine996.wasmify.listener.MyWasmServiceListener"
+                topic="com.github.okayfine996.wasmify.listener.WasmServiceListener"/>
+    </projectListeners>
+    <actions>
+        <action id="com.github.okayfine996.wasmify.actions.DeployWasmContractAction"
+                class="com.github.okayfine996.wasmify.actions.DeployWasmContractAction" text="DeployWasm"
+                description="Store Wasm Contract And Instantiate it">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </action>
+    </actions>
 </idea-plugin>

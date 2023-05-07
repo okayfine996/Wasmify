@@ -6,16 +6,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class BroadcastTx {
     private String mode;
-    private String type = "cosmos-sdk/StdTx";
     private StdTx tx;
+
+    private String nonce;
 
 
     public BroadcastTx() {
     }
 
-    public BroadcastTx(String mode, StdTx tx) {
+    public BroadcastTx(String mode, StdTx tx, String nonce) {
         this.mode = mode;
         this.tx = tx;
+        this.nonce = nonce;
     }
 
     public StdTx getTx() {
@@ -34,10 +36,13 @@ public class BroadcastTx {
         this.mode = mode;
     }
 
+    public String getNonce() {
+        return nonce;
+    }
 
-//    public String getType() {
-//        return type;
-//    }
+    public void setNonce(String nonce) {
+        this.nonce = nonce;
+    }
 
     public String toJson() throws JsonProcessingException {
         return new ObjectMapper().writeValueAsString(this);

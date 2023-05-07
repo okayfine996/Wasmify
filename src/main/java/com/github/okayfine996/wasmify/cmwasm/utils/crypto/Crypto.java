@@ -1,10 +1,8 @@
 package com.github.okayfine996.wasmify.cmwasm.utils.crypto;
 
-import com.google.common.base.Splitter;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Utils;
-import org.bitcoinj.crypto.*;
 import org.bouncycastle.util.encoders.DecoderException;
 import org.bouncycastle.util.encoders.Hex;
 
@@ -13,7 +11,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
-import java.util.List;
 
 public class Crypto {
 

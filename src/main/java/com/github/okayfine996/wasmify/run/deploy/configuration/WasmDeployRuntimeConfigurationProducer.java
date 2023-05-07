@@ -15,9 +15,7 @@ public class WasmDeployRuntimeConfigurationProducer extends LazyRunConfiguration
 
     @Override
     protected boolean setupConfigurationFromContext(@NotNull WasmRunDeployConfiguration configuration, @NotNull ConfigurationContext context, @NotNull Ref<PsiElement> sourceElement) {
-        configuration.setScriptName("hhhhhhh");
-        System.out.println("hhhhhhh");
-        System.out.println(context);
+
         return true;
     }
 

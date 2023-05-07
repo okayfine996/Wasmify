@@ -48,4 +48,6 @@ public class CWModuleType extends ModuleType<CWModuleBuilder> {
     public ModuleWizardStep @NotNull [] createWizardSteps(@NotNull WizardContext wizardContext, @NotNull CWModuleBuilder moduleBuilder, @NotNull ModulesProvider modulesProvider) {
         return super.createWizardSteps(wizardContext, moduleBuilder, modulesProvider);
     }
+
+
 }

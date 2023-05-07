@@ -1,42 +1,52 @@
 package com.github.okayfine996.wasmify.cmwasm.wasm;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.okayfine996.wasmify.cmwasm.core.BroadcastTx;
 import com.github.okayfine996.wasmify.cmwasm.core.Signer;
 import com.github.okayfine996.wasmify.cmwasm.core.StdTx;
+import com.github.okayfine996.wasmify.cmwasm.core.TxResponse;
+import com.github.okayfine996.wasmify.cmwasm.model.Account;
 import com.github.okayfine996.wasmify.cmwasm.utils.Utils;
+import com.github.okayfine996.wasmify.cmwasm.utils.crypto.AddressConvertUtil;
 import com.github.okayfine996.wasmify.cmwasm.wasm.msg.BaseMsg;
+import com.github.okayfine996.wasmify.cmwasm.wasm.msg.InstantiateMsg;
 import com.github.okayfine996.wasmify.cmwasm.wasm.msg.StoreCodeMsg;
 import okhttp3.*;
+import org.checkerframework.checker.units.qual.A;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 
 public class WasmClient {
 
     private String restUrl;
 
-    private String chainId = "exchain-67";
+    private String chainId;
 
     private String txMode;
 
     private OkHttpClient httpClient;
 
-    public WasmClient(String restUrl, String txMode) {
+    public WasmClient(String restUrl,String chainId, String txMode) {
         this.restUrl = restUrl;
         this.txMode = txMode;
+        this.chainId = chainId;
         this.httpClient = new OkHttpClient();
     }
 
-    public Object broadcastTx(StdTx stdTx) {
-        BroadcastTx broadcastTx = new BroadcastTx(this.txMode, stdTx);
+    public TxResponse broadcastTx(StdTx stdTx, String nonce) {
+        BroadcastTx broadcastTx = new BroadcastTx(this.txMode, stdTx, nonce);
         Response response = null;
         try {
             Request request = new Request.Builder()
-                    .url(this.restUrl)
+                    .url(this.restUrl + "/v1/txs")
                     .post(RequestBody.create(MediaType.parse("application/json;charset=UTF-8"), broadcastTx.toJson()))
                     .build();
-            System.out.println(broadcastTx.toJson());
+
             response = httpClient.newCall(request).execute();
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
@@ -47,7 +57,7 @@ public class WasmClient {
         if (response != null) {
             try {
                 String st = response.body().string();
-                System.out.println(st);
+                return JSON.parseObject(st, TxResponse.class);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -56,32 +66,107 @@ public class WasmClient {
         return null;
     }
 
-    public int storeCode(String privateKey, String accountNumber, String nonce, String wasmFile) throws IOException {
+    public int storeCode(String privateKey, String wasmFile) throws IOException {
         byte[] wasmBinary = Utils.compressBytes(wasmFile);
         Signer signer = new Signer(privateKey);
+        Account account = this.queryAccount(signer.getAddress());
+        if (account == null) {
+            throw new RuntimeException("query account failed");
+        }
+        signer.setAccountNum(account.getAccountNumber() + "");
+        signer.setChainId(this.chainId);
 
         Base64.Encoder encoder = Base64.getEncoder();
         String encodedWasmData = encoder.encodeToString(wasmBinary);
         String jsonStr = "{\"permission\":\"Everybody\"}";
         StoreCodeMsg storeCodeMsg = new StoreCodeMsg(Utils.getSortJson(jsonStr), signer.getAddress(), encodedWasmData);
 
+        StdTx stdTx = signer.buildAndSignStdTx(new BaseMsg<StoreCodeMsg>("wasm/MsgStoreCode", storeCodeMsg), "0.03", "30000000", "", account.getSequence() + "");
+        TxResponse txResponse = this.broadcastTx(stdTx, account.getSequence() + "");
+        if (!txResponse.isSucceed()) {
+            throw new RuntimeException(txResponse.toString());
+        }
 
-        signer.setAccountNum(accountNumber);
+        String log = txResponse.getRawLog();
+        int index = log.lastIndexOf(":");
+        log = log.substring(index);
+        log = log.substring(2, log.indexOf("}") - 1);
+        return Integer.valueOf(log);
+    }
+
+    public String instantiate(String privateKey, int codeId, String initMsg) throws IOException {
+        Signer signer = new Signer(privateKey);
+        Account account = this.queryAccount(signer.getAddress());
+        if (account == null) {
+            throw new RuntimeException("query account failed");
+        }
+        signer.setAccountNum(account.getAccountNumber() + "");
         signer.setChainId(this.chainId);
-        StdTx stdTx = signer.buildAndSignStdTx(new BaseMsg<StoreCodeMsg>("wasm/MsgStoreCode", storeCodeMsg), "0.03", "30000000", "", nonce);
-        this.broadcastTx(stdTx);
 
-        return 0;
+        InstantiateMsg instantiateMsg = new InstantiateMsg(AddressConvertUtil.convertFromBech32ToHex(signer.getAddress()), codeId + "", Arrays.asList(new Fund("1", "okb")), "v1.0.0", Utils.getSortJson(initMsg), signer.getAddress());
+        StdTx stdTx = signer.buildAndSignStdTx(new BaseMsg<InstantiateMsg>("wasm/MsgInstantiateContract", instantiateMsg), "0.03", "30000000", "", account.getSequence() + "");
+        TxResponse txResponse = this.broadcastTx(stdTx, account.getSequence() + "");
+        if (!txResponse.isSucceed()) {
+            throw new RuntimeException(txResponse.toString());
+        }
+
+        String log = txResponse.getRawLog();
+        int index = log.indexOf("address");
+        return log.substring(index + 18, index + 60);
     }
 
 
-    public static void main(String[] args) {
-        WasmClient client = new WasmClient("http://127.0.0.1:8545/exchain/v1/txs","block");
-        String wasmFile = "/Users/finefine/workspace/java/Wasmify/src/main/java/com/github/okayfine996/wasmify/cmwasm/wasm/cw20_base.wasm";
+    public String deployWasmContract(String privateKey, String wasmFile, String initMsg) {
         try {
-            client.storeCode("8FF3CA2D9985C3A52B459E2F6E7822B23E1AF845961E22128D5F372FB9AA5F17","0","1", wasmFile);
+            int codeId = this.storeCode(privateKey, wasmFile);
+            String contractAddress = this.instantiate(privateKey, codeId, initMsg);
+            return contractAddress;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static void main(String[] args) {
+        WasmClient client = new WasmClient("http://127.0.0.1:8545","okbchain-67", "block");
+        String wasmFile = "src/main/java/com/github/okayfine996/wasmify/cmwasm/wasm/hackatom.wasm";
+        try {
+            int code = client.storeCode("8FF3CA2D9985C3A52B459E2F6E7822B23E1AF845961E22128D5F372FB9AA5F17", wasmFile);
+            String initMsg = "{\"verifier\": \"0xbbE4733d85bc2b90682147779DA49caB38C0aA1F\", \"beneficiary\": \"0xbbE4733d85bc2b90682147779DA49caB38C0aA1F\"}";
+            String contractAddr = client.instantiate("8FF3CA2D9985C3A52B459E2F6E7822B23E1AF845961E22128D5F372FB9AA5F17", code, initMsg);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+
+    public Account queryAccount(String bech32Addr) {
+        Request request = new Request.Builder()
+                .get()
+                .url(restUrl + "/v1/auth/accounts/" + bech32Addr)
+                .build();
+        Account account = null;
+        try {
+            Response response = this.httpClient.newCall(request).execute();
+            if (!response.isSuccessful()) {
+                return account;
+            }
+
+            String jsonStr = response.body().string();
+            JSONObject jsonObject = JSON.parseObject(jsonStr);
+            if (!jsonObject.containsKey("value")) {
+                return account;
+            }
+
+            int accountNum = jsonObject.getJSONObject("value").getIntValue("account_number");
+            int sequence = jsonObject.getJSONObject("value").getIntValue("sequence");
+            account = new Account(accountNum, sequence);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return account;
     }
 }

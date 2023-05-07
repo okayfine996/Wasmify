@@ -19,6 +19,13 @@ public class Fund {
     @SerializedName("denom")
     private String denom;
 
+    public Fund() {
+    }
+
+    public Fund(String amount, String denom) {
+        this.amount = amount;
+        this.denom = denom;
+    }
 
     public String getAmount() {
         return amount;
@@ -35,4 +42,6 @@ public class Fund {
     public void setDenom(String denom) {
         this.denom = denom;
     }
+
+
 }

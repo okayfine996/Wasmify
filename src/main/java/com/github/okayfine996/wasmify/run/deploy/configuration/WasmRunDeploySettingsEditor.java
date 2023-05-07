@@ -6,22 +6,26 @@ import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.ui.LabeledComponent;
 import com.intellij.openapi.ui.TextBrowseFolderListener;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
+import com.intellij.ui.components.JBTextField;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class WasmRunDeploySettingsEditor extends SettingsEditor<WasmRunDeployConfiguration> {
     private JPanel myPanel;
-    private LabeledComponent<TextFieldWithBrowseButton> myScriptName;
+    private LabeledComponent<JBTextField> privateKey;
+    private LabeledComponent<JBTextField> restApi;
+    private LabeledComponent<JBTextField> denom;
+    private LabeledComponent instantiateMsg;
 
     @Override
     protected void resetEditorFrom(@NotNull WasmRunDeployConfiguration s) {
-        myScriptName.getComponent().setText(s.getScriptName());
+
     }
 
     @Override
     protected void applyEditorTo(@NotNull WasmRunDeployConfiguration s) throws ConfigurationException {
-        s.setScriptName(myScriptName.getComponent().getText());
     }
 
     @Override
@@ -30,13 +34,15 @@ public class WasmRunDeploySettingsEditor extends SettingsEditor<WasmRunDeployCon
     }
 
     private void createUIComponents() {
-        myScriptName = new LabeledComponent<>();
-        TextFieldWithBrowseButton browseButton = new TextFieldWithBrowseButton();
-        browseButton.setEnabled(true);
+        privateKey = new LabeledComponent<>();
+        privateKey.setComponent(new JBTextField());
+        restApi = new LabeledComponent<>();
+        restApi.setComponent(new JBTextField());
+        denom = new LabeledComponent<>();
+        denom.setComponent(new JBTextField());
+        instantiateMsg = new LabeledComponent<>();
+        instantiateMsg.setComponent(new JBTextField());
 
-        myScriptName.setComponent(browseButton);
-
-        browseButton.addBrowseFolderListener(new TextBrowseFolderListener(new FileChooserDescriptor(true,true,true,true,true,false)));
     }
 
 }
