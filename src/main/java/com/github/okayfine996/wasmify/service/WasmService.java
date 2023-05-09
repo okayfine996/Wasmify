@@ -12,16 +12,34 @@ public class WasmService {
     private HashMap<String, Network> networkHashMap = new HashMap<>();
 
     public WasmService() {
-        networkHashMap.put("okb-local", new Network("okb-local", "okbchain-67","okb","http://localhost:8545","block"));
+        networkHashMap.put("okb-local", new Network("okb-local", "okbchain-67", "okb", "http://localhost:8545", "block"));
     }
 
-    public String deployWasmContract(String network ,String wasmFile, String account, String initMsg) {
+    public String deployWasmContract(String network, String wasmFile, String account, String initMsg) {
         var net = networkHashMap.get(network);
         if (net == null) {
             return null;
         }
 
-        WasmClient wasmClient = new WasmClient(net.getUrl(),net.getChainId(),net.getTxMode());
-        return wasmClient.deployWasmContract(account,wasmFile,initMsg);
+        WasmClient wasmClient = new WasmClient(net.getUrl(), net.getChainId(), net.getTxMode());
+        return wasmClient.deployWasmContract(account, wasmFile, initMsg);
+    }
+
+    public String executeWasmContract(String network, String contractAddress, String account, String executeMsg) {
+        var net = networkHashMap.get(network);
+        if (net == null) {
+            return null;
+        }
+        WasmClient wasmClient = new WasmClient(net.getUrl(), net.getChainId(), net.getTxMode());
+        return wasmClient.executeWasmContract(account, contractAddress, executeMsg);
+    }
+
+    public String queryWasmContract(String network, String contractAddress, String queryMsg) {
+        var net = networkHashMap.get(network);
+        if (net == null) {
+            return null;
+        }
+        WasmClient wasmClient = new WasmClient(net.getUrl(), net.getChainId(), net.getTxMode());
+        return wasmClient.queryWasmContract(contractAddress, queryMsg);
     }
 }

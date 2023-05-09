@@ -6,7 +6,5 @@ public interface WasmServiceListener {
     @Topic.ProjectLevel
     Topic<WasmServiceListener> TOPIC = new Topic<>("wasm service events", WasmServiceListener.class);
 
-    void deployWasmEvent(String contractAddress);
-
-    void update();
+    void deployWasmEvent(String signer,String contractAddress, String chainName);
 }

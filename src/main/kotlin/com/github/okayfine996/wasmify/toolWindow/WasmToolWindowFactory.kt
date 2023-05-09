@@ -23,6 +23,7 @@ import com.intellij.openapi.util.IconLoader
 import com.intellij.openapi.wm.impl.status.widget.StatusBarWidgetWrapper
 import com.intellij.ui.components.JBComboBoxLabel
 import com.intellij.ui.components.JBList
+import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.components.fields.ExpandableTextField
 import com.intellij.ui.components.fields.ExtendableTextField
@@ -45,7 +46,6 @@ import javax.swing.plaf.ScrollPaneUI
 
 
 class WasmToolWindowFactory : ToolWindowFactory {
-
     init {
         thisLogger().warn("Don't forget to remove all non-needed sample code files with their corresponding registration entries in `plugin.xml`.")
     }
@@ -53,8 +53,8 @@ class WasmToolWindowFactory : ToolWindowFactory {
     private val contentFactory = ContentFactory.SERVICE.getInstance()
 
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
-
         val wasmToolWindow = WasmToolWindow(toolWindow)
+        map = wasmToolWindow
         val content = contentFactory.createContent(wasmToolWindow.getContent(), null, false)
         toolWindow.contentManager.addContent(content)
 
@@ -63,91 +63,35 @@ class WasmToolWindowFactory : ToolWindowFactory {
     override fun shouldBeAvailable(project: Project) = true
 
 
+    companion object {
+        lateinit var map: WasmToolWindow
+    }
+
+    fun getWasmToolWindow():WasmToolWindow {
+        return map
+    }
+
 }
 
 class WasmToolWindow(toolWindow: ToolWindow) {
 
     private val service = toolWindow.project.service<MyProjectService>()
 
+    private val container = JPanel()
+    private val map = HashMap<String,WasmContract>()
     init {
-        toolWindow.project.messageBus.connect().subscribe(
-                WasmServiceListener.TOPIC, object : WasmServiceListener {
-            override fun deployWasmEvent(contractAddress: String?) {
-                println(contractAddress)
-            }
-
-            override fun update() {
-                println("update")
-            }
-
+        container.apply {
+            layout = VerticalFlowLayout()
         }
-        )
     }
 
     fun getContent(): JScrollPane {
-        var p = JPanel()
-        p.layout = VerticalFlowLayout()
-        p.setSize(300,2000)
-        p.add(WasmContract().rootPanel)
-        p.add(WasmContract().rootPanel)
-        p.add(WasmContract().rootPanel)
-        p.add(WasmContract().rootPanel)
-        p.add(WasmContract().rootPanel)
-
-        var jsP = JScrollPane(p)
-        jsP.verticalScrollBarPolicy = ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS
-        jsP.isVisible = true
-        return jsP
+        return JBScrollPane(container)
     }
-}
 
-class WasmToolWindowPanel : JPanel() {
-    init {
-//        var networkCombox = ComboBox<String>().apply {
-//            addItem("OKC")
-//            addItem("OKC2")
-//            addItem("OKC3")
-//            addItem("OKC4")
-//            addItem("OKC5")
-//        }
-//
-//        add(Box.createHorizontalBox().apply {
-//            add(JBLabel("Network"))
-//            add(networkCombox)
-//        })
-//
-//
-//        var deploy = JButton(AllIcons.Actions.Install).apply {
-//            setSize(20, 14)
-//            addActionListener {
-//
-//            }
-//        }
-//
-//        var initMsgTextField = LabeledComponent.create(ExpandableTextField(), "Init Msg")
-//
-//        add(Box.createHorizontalBox().apply {
-//            add(deploy)
-//            add(initMsgTextField)
-//        })
-
-
-
-        var p = JPanel()
-        p.layout = VerticalFlowLayout()
-        p.setSize(300,2000)
-        p.add(WasmContract().rootPanel)
-        p.add(WasmContract().rootPanel)
-        p.add(WasmContract().rootPanel)
-        p.add(WasmContract().rootPanel)
-        p.add(WasmContract().rootPanel)
-
-        var jsP = JScrollPane(p)
-        jsP.verticalScrollBarPolicy = ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS
-        jsP.isVisible = true
-        add(jsP)
-
-
+    fun addContract(contract: WasmContract) {
+        map.put(contract.contractAddress, contract)
+        container.add(contract.rootPanel)
     }
 }
 

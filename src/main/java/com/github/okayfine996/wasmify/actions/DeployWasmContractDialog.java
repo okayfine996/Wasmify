@@ -4,7 +4,11 @@ import com.github.okayfine996.wasmify.listener.WasmServiceListener;
 import com.github.okayfine996.wasmify.service.WasmService;
 import com.github.okayfine996.wasmify.services.MyProjectService;
 import com.github.okayfine996.wasmify.toolWindow.WasmToolWindow;
+import com.github.okayfine996.wasmify.toolWindow.WasmToolWindowFactory;
+import com.github.okayfine996.wasmify.ui.contract.WasmContract;
 import com.intellij.ide.FrameStateListener;
+import com.intellij.notification.Notification;
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ComponentManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
@@ -87,11 +91,8 @@ public class DeployWasmContractDialog extends JDialog {
         if (contractAddress != null) {
             MessageBus messageBus = this.project.getMessageBus();
             WasmServiceListener publisher = messageBus.syncPublisher(WasmServiceListener.TOPIC);
-            publisher.deployWasmEvent(contractAddress);
-
-            ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow("Wasmify");
-            toolWindow.getContentManager().getContent(0);
-
+            publisher.deployWasmEvent(account,contractAddress,network);
+//            Notifications.Bus.notify(new Notification());
         }
 
 

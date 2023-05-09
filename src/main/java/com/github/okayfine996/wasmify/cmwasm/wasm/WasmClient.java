@@ -11,12 +11,14 @@ import com.github.okayfine996.wasmify.cmwasm.model.Account;
 import com.github.okayfine996.wasmify.cmwasm.utils.Utils;
 import com.github.okayfine996.wasmify.cmwasm.utils.crypto.AddressConvertUtil;
 import com.github.okayfine996.wasmify.cmwasm.wasm.msg.BaseMsg;
+import com.github.okayfine996.wasmify.cmwasm.wasm.msg.ExecuteMsg;
 import com.github.okayfine996.wasmify.cmwasm.wasm.msg.InstantiateMsg;
 import com.github.okayfine996.wasmify.cmwasm.wasm.msg.StoreCodeMsg;
 import okhttp3.*;
 import org.checkerframework.checker.units.qual.A;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -31,7 +33,7 @@ public class WasmClient {
 
     private OkHttpClient httpClient;
 
-    public WasmClient(String restUrl,String chainId, String txMode) {
+    public WasmClient(String restUrl, String chainId, String txMode) {
         this.restUrl = restUrl;
         this.txMode = txMode;
         this.chainId = chainId;
@@ -128,8 +130,60 @@ public class WasmClient {
         return null;
     }
 
+    public String executeWasmContract(String privateKey, String contractAddress, String execMsg) {
+        Signer signer = new Signer(privateKey);
+        Account account = this.queryAccount(signer.getAddress());
+        if (account == null) {
+            throw new RuntimeException("query account failed");
+        }
+        signer.setAccountNum(account.getAccountNumber() + "");
+        signer.setChainId(this.chainId);
+
+        ExecuteMsg executeMsg = new ExecuteMsg(contractAddress, Arrays.asList(new Fund("1", "okb")), Utils.getSortJson(execMsg), signer.getAddress());
+        StdTx stdTx = null;
+        try {
+            stdTx = signer.buildAndSignStdTx(new BaseMsg<ExecuteMsg>("wasm/MsgExecuteContract", executeMsg), "0.03", "30000000", "", account.getSequence() + "");
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        TxResponse txResponse = this.broadcastTx(stdTx, account.getSequence() + "");
+        if (!txResponse.isSucceed()) {
+            throw new RuntimeException(txResponse.toString());
+        }
+        return txResponse.getTxhash();
+    }
+
+    public String queryWasmContract(String contractAddress, String queryMsg) {
+        String queryKey = Base64.getEncoder().encodeToString(queryMsg.getBytes(Charset.forName("utf8")));
+        String url = String.format("%s/v1/wasm/contract/%s/smart/%s?encoding=base64", this.restUrl, contractAddress, queryKey);
+        Response response = null;
+        try {
+            Request request = new Request.Builder()
+                    .url(url)
+                    .get()
+                    .build();
+            response = httpClient.newCall(request).execute();
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        if (response != null) {
+            try {
+                String st = response.body().string();
+                return st;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return null;
+    }
+
+
     public static void main(String[] args) {
-        WasmClient client = new WasmClient("http://127.0.0.1:8545","okbchain-67", "block");
+        WasmClient client = new WasmClient("http://127.0.0.1:8545", "okbchain-67", "block");
         String wasmFile = "src/main/java/com/github/okayfine996/wasmify/cmwasm/wasm/hackatom.wasm";
         try {
             int code = client.storeCode("8FF3CA2D9985C3A52B459E2F6E7822B23E1AF845961E22128D5F372FB9AA5F17", wasmFile);
