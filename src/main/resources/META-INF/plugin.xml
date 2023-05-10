@@ -29,6 +29,7 @@
                 implementation="com.github.okayfine996.wasmify.run.build.configuration.WasmBuildTaskProvider"/>
 
         <applicationService serviceImplementation="com.github.okayfine996.wasmify.service.WasmService"/>
+        <notificationGroup displayType="BALLOON" id="WasmNotificationGroup" key="notification.group.name"/>
     </extensions>
 
     <applicationListeners>
@@ -47,4 +48,6 @@
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
         </action>
     </actions>
+
+
 </idea-plugin>

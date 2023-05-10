@@ -1,6 +1,8 @@
 package com.github.okayfine996.wasmify.ui.contract;
 
+import com.github.okayfine996.wasmify.notify.Notifier;
 import com.github.okayfine996.wasmify.service.WasmService;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.ui.LabeledComponent;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.fields.ExpandableTextField;
@@ -45,6 +47,7 @@ public class WasmContract {
                 if (wasmContractActionListener != null) {
                     System.out.println("=================================================");
                     String r = wasmContractActionListener.execute(signer, contractAddress, excuteMsgTextField.getText(), chainName);
+                    Notifier.notifyInfo(null, r);
                     System.out.println(r);
                 }
             }
@@ -57,6 +60,7 @@ public class WasmContract {
                 if (wasmContractActionListener != null) {
                     System.out.println("==================================================");
                     String r = wasmContractActionListener.query(contractAddress, queryMsgTextField.getText(), chainName);
+                    Notifier.notifyInfo(null, r);
                     System.out.println(r);
                 }
             }

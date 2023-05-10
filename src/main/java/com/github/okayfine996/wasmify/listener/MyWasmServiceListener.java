@@ -3,6 +3,7 @@ package com.github.okayfine996.wasmify.listener;
 import com.github.okayfine996.wasmify.service.WasmService;
 import com.github.okayfine996.wasmify.toolWindow.WasmToolWindowFactory;
 import com.github.okayfine996.wasmify.ui.contract.WasmContract;
+import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.application.ApplicationManager;
 
 public class MyWasmServiceListener implements WasmServiceListener {
@@ -11,6 +12,7 @@ public class MyWasmServiceListener implements WasmServiceListener {
     @Override
     public void deployWasmEvent(String signer, String contractAddress, String chainName) {
         WasmContract wasmContract = new WasmContract(contractAddress, chainName,signer);
+        wasmService.getContractList().add(new WasmService.WasmContract(contractAddress,chainName,signer));
         wasmContract.setWasmContractActionListener(new WasmContract.WasmContractActionListener() {
             @Override
             public String execute(String signer, String contractAddress, String executeMsg, String chain) {
