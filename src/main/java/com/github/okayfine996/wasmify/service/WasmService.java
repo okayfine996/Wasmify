@@ -22,7 +22,7 @@ public class WasmService implements PersistentStateComponent<WasmService.WasmSta
     private WasmState wasmState = new WasmState();
 
     public WasmService() {
-        networkHashMap.put("okbchain-67", new Network("okb-local", "okbchain-67", "okb", "http://localhost:8545", "block"));
+
     }
 
     public String deployWasmContract(String network, String wasmFile, String account, String initMsg) {
@@ -55,12 +55,14 @@ public class WasmService implements PersistentStateComponent<WasmService.WasmSta
 
     @Override
     public @Nullable WasmService.WasmState getState() {
+//        wasmState.getNetworkList().add(new Network("okb-local","okbchain-67","okb","http://localhost:8545","block"));
         return wasmState;
     }
 
     @Override
     public void loadState(@NotNull WasmState state) {
         this.wasmState = state;
+        state.networkList.forEach(e-> networkHashMap.put(e.getChainId(),e));
     }
 
 

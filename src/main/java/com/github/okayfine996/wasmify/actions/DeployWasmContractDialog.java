@@ -107,7 +107,7 @@ public class DeployWasmContractDialog extends JDialog {
 
     private void createUIComponents() {
         Network = new LabeledComponent<>();
-        ComboBox<String> networkCombox = new ComboBox<>(new String[]{"okb-local","OKC2"});
+        ComboBox<String> networkCombox = new ComboBox<>(new String[]{"okbchain-67"});
         Network.setComponent(networkCombox);
 
         wasmFile = new LabeledComponent<>();

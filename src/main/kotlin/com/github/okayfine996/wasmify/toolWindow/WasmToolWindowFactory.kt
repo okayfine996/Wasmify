@@ -26,8 +26,19 @@ class WasmToolWindowFactory : ToolWindowFactory {
         val wasmToolWindow = WasmToolWindow(toolWindow)
         map = wasmToolWindow
         val content = contentFactory.createContent(wasmToolWindow.getContent(), null, false)
+        wasmService.contractList[0].chainName="okbchain-67"
         wasmService.contractList.forEach {
-            wasmToolWindow.addContract(WasmContract(it.contractAddress,it.chainName,it.signer))
+            wasmToolWindow.addContract(WasmContract(it.contractAddress,it.chainName,it.signer).apply {
+                setWasmContractActionListener(object :WasmContract.WasmContractActionListener{
+                    override fun execute(signer: String?, contractAddress: String?, executeMsg: String?, chain: String?): String {
+                       return wasmService.executeWasmContract(chain,contractAddress,signer,executeMsg)
+                    }
+
+                    override fun query(contractAddress: String?, queryMsg: String?, chain: String?): String {
+                        return wasmService.queryWasmContract(chain,contractAddress,queryMsg)
+                    }
+                } )
+            })
         }
         toolWindow.contentManager.addContent(content)
 

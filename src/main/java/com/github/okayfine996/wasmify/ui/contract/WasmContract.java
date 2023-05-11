@@ -2,7 +2,9 @@ package com.github.okayfine996.wasmify.ui.contract;
 
 import com.github.okayfine996.wasmify.notify.Notifier;
 import com.github.okayfine996.wasmify.service.WasmService;
+import com.intellij.execution.process.mediator.daemon.ProcessManager;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.ui.LabeledComponent;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.fields.ExpandableTextField;
@@ -23,7 +25,7 @@ public class WasmContract {
     private String contractAddress;
     private String chainName;
 
-    private WasmContractActionListener wasmContractActionListener = null;
+    private WasmContractActionListener wasmContractActionListener;
 
     public WasmContract(String contractAddress, String chainName, String signer) {
         this.contractAddress = contractAddress;
@@ -38,17 +40,17 @@ public class WasmContract {
     private void createUIComponents() {
         contractLabeledComponent = new LabeledComponent<>();
         contractLabeledComponent.setComponent(new JBLabel(contractAddress));
-
-
         executeButton = new JButton("EXECUTE");
         executeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (wasmContractActionListener != null) {
-                    System.out.println("=================================================");
-                    String r = wasmContractActionListener.execute(signer, contractAddress, excuteMsgTextField.getText(), chainName);
-                    Notifier.notifyInfo(null, r);
-                    System.out.println(r);
+                    ProgressManager.getInstance().executeNonCancelableSection(()->{
+                        System.out.println("=================================================");
+                        String r = wasmContractActionListener.execute(signer, contractAddress, excuteMsgTextField.getText(), chainName);
+                        Notifier.notifyInfo(null, r);
+                        System.out.println(r);
+                    });
                 }
             }
         });
