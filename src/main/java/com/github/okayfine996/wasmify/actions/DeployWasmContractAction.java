@@ -38,7 +38,7 @@ public class DeployWasmContractAction extends AnAction {
         DeployWasmContractDialog dialog = new DeployWasmContractDialog(event.getProject(),wasmFilePath);
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
 
-        int width = 400;
+        int width = 600;
         int height = 300;
         dialog.setBounds((dimension.width - width) / 2, (dimension.height - height) / 2, width, height);
         dialog.pack();

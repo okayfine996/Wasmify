@@ -9,6 +9,7 @@ import javax.swing.*;
 public class SignerCell {
     private LabeledComponent name;
     private LabeledComponent value;
+    private JPanel rootPanel;
 
     public SignerCell(String name,String value) {
         this.name.setComponent(new JBLabel(name));
@@ -16,5 +17,10 @@ public class SignerCell {
         jbPasswordField.setText(value);
         jbPasswordField.setEditable(false);
         this.value.setComponent(jbPasswordField);
+    }
+
+
+    public JComponent getContent() {
+        return this.rootPanel;
     }
 }

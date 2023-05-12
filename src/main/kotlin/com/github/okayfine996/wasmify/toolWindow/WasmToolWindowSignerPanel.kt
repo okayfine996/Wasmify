@@ -1,10 +1,14 @@
 package com.github.okayfine996.wasmify.toolWindow
 
 import com.github.okayfine996.wasmify.service.WasmService
+import com.github.okayfine996.wasmify.service.WasmService.Signer
 import com.github.okayfine996.wasmify.ui.signer.AddSignerDialog
+import com.github.okayfine996.wasmify.ui.signer.SignerCell
 import com.intellij.icons.AllIcons
+import com.intellij.openapi.actionSystem.DataProvider
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.ui.SimpleToolWindowPanel
+import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBPanel
 import com.intellij.ui.components.panels.HorizontalLayout
 import java.awt.Toolkit
@@ -22,6 +26,11 @@ class WasmToolWindowSignerPanel : SimpleToolWindowPanel(true) {
             dialog.show()
         }
     }
+
+    private var jbList = JBList<Signer>().apply {
+        setCellRenderer { list, value, index, isSelected, cellHasFocus ->  SignerCell(value.name,value.value).content}
+    }
+
     private val wasmService = ApplicationManager.getApplication().getService(WasmService::class.java);
 
     init {
@@ -29,5 +38,13 @@ class WasmToolWindowSignerPanel : SimpleToolWindowPanel(true) {
             layout = HorizontalLayout(10)
             add(addNetwork)
         }
+
+        jbList.setListData(wasmService.signerList.toTypedArray())
+
+        setContent(jbList)
+    }
+
+    fun updateList() {
+        jbList.setListData(wasmService.signerList.toTypedArray())
     }
 }

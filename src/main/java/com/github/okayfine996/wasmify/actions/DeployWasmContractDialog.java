@@ -35,8 +35,11 @@ public class DeployWasmContractDialog extends JDialog {
     private String wasmFilePath;
 
     public DeployWasmContractDialog(Project project, String wasmFilePath) {
+        setTitle("Deploy Wasm Contract");
         this.project = project;
         this.wasmFilePath = wasmFilePath;
+        this.wasmFileBrowseButton.setText(wasmFilePath);
+
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);

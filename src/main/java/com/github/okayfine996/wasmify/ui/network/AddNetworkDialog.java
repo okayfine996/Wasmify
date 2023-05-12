@@ -1,32 +1,26 @@
-package com.github.okayfine996.wasmify.ui.signer;
+package com.github.okayfine996.wasmify.ui.network;
 
-import com.github.okayfine996.wasmify.notify.Notifier;
-import com.github.okayfine996.wasmify.service.WasmService;
-import com.github.okayfine996.wasmify.toolWindow.WasmToolWindowFactory;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.LabeledComponent;
-import com.intellij.openapi.wm.ToolWindowManager;
-import com.intellij.ui.components.JBPasswordField;
 import com.intellij.ui.components.JBTextField;
-import kotlinx.serialization.StringFormat;
 
 import javax.swing.*;
 import java.awt.event.*;
 
-public class AddSignerDialog extends JDialog {
+public class AddNetworkDialog extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
-    private LabeledComponent value;
-    private LabeledComponent name;
-    private JBTextField nameTextField = new JBTextField();
-    private JBPasswordField valueFiled = new JBPasswordField();
 
-    public AddSignerDialog() {
+    private LabeledComponent<JBTextField> name;
+    private LabeledComponent<JBTextField> chainId;
+    private LabeledComponent<JBTextField> restURL;
+    private LabeledComponent<JBTextField> explorerURL;
+    private LabeledComponent<JBTextField> denom;
 
-        name.setComponent(nameTextField);
-        value.setComponent(valueFiled);
+    public AddNetworkDialog() {
+        setTitle("Add Network Config");
+
+        initView();
 
         setContentPane(contentPane);
         setModal(true);
@@ -62,15 +56,19 @@ public class AddSignerDialog extends JDialog {
 
     private void onOK() {
         // add your code here
-        WasmService wasmService = ApplicationManager.getApplication().getService(WasmService.class);
-        wasmService.addSigner(new WasmService.Signer(nameTextField.getText(), valueFiled.getText()));
-        Notifier.notifyInfo(null, String.format("add %s success", nameTextField.getText()));
-        WasmToolWindowFactory.Companion.getSignerPanel().updateList();
         dispose();
     }
 
     private void onCancel() {
         // add your code here if necessary
         dispose();
+    }
+
+    private void initView() {
+        name.setComponent(new JBTextField());
+        chainId.setComponent(new JBTextField());
+        restURL.setComponent(new JBTextField());
+        explorerURL.setComponent(new JBTextField());
+        denom.setComponent(new JBTextField());
     }
 }

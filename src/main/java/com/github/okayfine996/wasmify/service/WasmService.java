@@ -100,7 +100,7 @@ public class WasmService implements PersistentStateComponent<WasmService.WasmSta
         public List<WasmContract> contractList;
         public List<Network> networkList;
 
-        private List<Signer> signerList;
+        public List<Signer> signerList;
 
         public WasmState() {
             this.contractList = new ArrayList<>();

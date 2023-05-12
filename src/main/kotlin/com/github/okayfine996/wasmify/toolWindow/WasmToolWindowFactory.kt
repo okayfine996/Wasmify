@@ -22,6 +22,9 @@ class WasmToolWindowFactory : ToolWindowFactory {
         thisLogger().warn("Don't forget to remove all non-needed sample code files with their corresponding registration entries in `plugin.xml`.")
     }
 
+//    private val networkPanel = WasmToolWindowNetworkPanel(true, true)
+//    private val signerPanel = WasmToolWindowSignerPanel()
+
     private val contentFactory = ContentFactory.SERVICE.getInstance()
     private val wasmService = ApplicationManager.getApplication().getService(WasmService::class.java)
 
@@ -47,10 +50,9 @@ class WasmToolWindowFactory : ToolWindowFactory {
 
         toolWindow.contentManager.addContent(content)
 
-        val networkPanel = WasmToolWindowNetworkPanel(true, true)
         toolWindow.contentManager.addContent(contentFactory.createContent(networkPanel, "Network", false))
-        val signerPanel = WasmToolWindowSignerPanel()
-        toolWindow.contentManager.addContent(contentFactory.createContent(signerPanel,"Signer",false))
+
+        toolWindow.contentManager.addContent(contentFactory.createContent(signerPanel, "Signer", false))
     }
 
     override fun shouldBeAvailable(project: Project) = true
@@ -58,12 +60,15 @@ class WasmToolWindowFactory : ToolWindowFactory {
 
     companion object {
         lateinit var map: WasmToolWindow
+        var signerPanel = WasmToolWindowSignerPanel()
+        var networkPanel = WasmToolWindowNetworkPanel(true, true)
+//        fun getSignerPanel() = signerPanel
+//        fun getNetworkPanel() = networkPanel
     }
 
     fun getWasmToolWindow(): WasmToolWindow {
         return map
     }
-
 }
 
 class WasmToolWindow(toolWindow: ToolWindow) {
