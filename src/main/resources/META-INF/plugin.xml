@@ -26,7 +26,7 @@
         <moduleType id="COSMOS_WASM_MODULE_TYPE"
                     implementationClass="com.github.okayfine996.wasmify.module.CWModuleType"/>
         <stepsBeforeRunProvider
-                implementation="com.github.okayfine996.wasmify.run.build.configuration.WasmBuildTaskProvider"/>
+                implementation="com.github.okayfine996.wasmify.run.wasmbuild.configuration.WasmBuildTaskProvider"/>
 
         <applicationService serviceImplementation="com.github.okayfine996.wasmify.service.WasmService"/>
         <notificationGroup displayType="BALLOON" id="WasmNotificationGroup" key="notification.group.name"/>
