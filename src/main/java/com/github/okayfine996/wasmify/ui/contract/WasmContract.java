@@ -4,10 +4,16 @@ import com.github.okayfine996.wasmify.notify.Notifier;
 import com.github.okayfine996.wasmify.service.WasmService;
 import com.intellij.execution.process.mediator.daemon.ProcessManager;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressIndicatorProvider;
 import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.LabeledComponent;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.fields.ExpandableTextField;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -45,11 +51,16 @@ public class WasmContract {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (wasmContractActionListener != null) {
-                    ProgressManager.getInstance().executeNonCancelableSection(()->{
-                        System.out.println("=================================================");
-                        String r = wasmContractActionListener.execute(signer, contractAddress, excuteMsgTextField.getText(), chainName);
-                        Notifier.notifyInfo(null, r);
-                        System.out.println(r);
+                    ProgressManager progressManager = ProgressManager.getInstance();
+                    Project project = ProjectManager.getInstance().getDefaultProject();
+                    progressManager.run(new Task.Backgroundable(project,"execute wasm") {
+                        @Override
+                        public void run(@NotNull ProgressIndicator indicator) {
+                            System.out.println("=================================================");
+                            String r = wasmContractActionListener.execute(signer, contractAddress, excuteMsgTextField.getText(), chainName);
+                            Notifier.notifyInfo(null, r);
+                            System.out.println(r);
+                        }
                     });
                 }
             }
@@ -60,10 +71,17 @@ public class WasmContract {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (wasmContractActionListener != null) {
-                    System.out.println("==================================================");
-                    String r = wasmContractActionListener.query(contractAddress, queryMsgTextField.getText(), chainName);
-                    Notifier.notifyInfo(null, r);
-                    System.out.println(r);
+                    ProgressManager progressManager = ProgressManager.getInstance();
+                    Project project = ProjectManager.getInstance().getDefaultProject();
+                    progressManager.run(new Task.Backgroundable(project,"query wasm") {
+                        @Override
+                        public void run(@NotNull ProgressIndicator indicator) {
+                            System.out.println("==================================================");
+                            String r = wasmContractActionListener.query(contractAddress, queryMsgTextField.getText(), chainName);
+                            Notifier.notifyInfo(null, r);
+                            System.out.println(r);
+                        }
+                    });
                 }
             }
         });

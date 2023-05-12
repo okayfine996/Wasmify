@@ -55,14 +55,16 @@ public class WasmService implements PersistentStateComponent<WasmService.WasmSta
 
     @Override
     public @Nullable WasmService.WasmState getState() {
-//        wasmState.getNetworkList().add(new Network("okb-local","okbchain-67","okb","http://localhost:8545","block"));
+        if (wasmState.networkList.size() == 0) {
+            wasmState.getNetworkList().add(new Network("okb-local", "okbchain-67", "okb", "http://localhost:8545", "block"));
+        }
         return wasmState;
     }
 
     @Override
     public void loadState(@NotNull WasmState state) {
         this.wasmState = state;
-        state.networkList.forEach(e-> networkHashMap.put(e.getChainId(),e));
+        state.networkList.forEach(e -> networkHashMap.put(e.getChainId(), e));
     }
 
 
@@ -120,10 +122,7 @@ public class WasmService implements PersistentStateComponent<WasmService.WasmSta
 
         @Override
         public String toString() {
-            return "WasmState{" +
-                    "contractList=" + contractList +
-                    ", networkList=" + networkList +
-                    '}';
+            return "WasmState{" + "contractList=" + contractList + ", networkList=" + networkList + '}';
         }
     }
 
@@ -156,11 +155,7 @@ public class WasmService implements PersistentStateComponent<WasmService.WasmSta
 
         @Override
         public String toString() {
-            return "WasmContract{" +
-                    "contractAddress='" + contractAddress + '\'' +
-                    ", chainName='" + chainName + '\'' +
-                    ", signer='" + signer + '\'' +
-                    '}';
+            return "WasmContract{" + "contractAddress='" + contractAddress + '\'' + ", chainName='" + chainName + '\'' + ", signer='" + signer + '\'' + '}';
         }
     }
 

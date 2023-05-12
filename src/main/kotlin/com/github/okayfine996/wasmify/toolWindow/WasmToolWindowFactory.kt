@@ -26,7 +26,6 @@ class WasmToolWindowFactory : ToolWindowFactory {
         val wasmToolWindow = WasmToolWindow(toolWindow)
         map = wasmToolWindow
         val content = contentFactory.createContent(wasmToolWindow.getContent(), null, false)
-        wasmService.contractList[0].chainName="okbchain-67"
         wasmService.contractList.forEach {
             wasmToolWindow.addContract(WasmContract(it.contractAddress,it.chainName,it.signer).apply {
                 setWasmContractActionListener(object :WasmContract.WasmContractActionListener{
