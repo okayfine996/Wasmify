@@ -2,6 +2,7 @@ package com.github.okayfine996.wasmify.toolWindow
 
 import com.github.okayfine996.wasmify.service.WasmService
 import com.github.okayfine996.wasmify.ui.contract.WasmContract
+import com.intellij.icons.AllIcons
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
@@ -9,7 +10,9 @@ import com.intellij.openapi.ui.VerticalFlowLayout
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.components.JBScrollPane
+import com.intellij.ui.components.Label
 import com.intellij.ui.content.ContentFactory
+import javax.swing.JButton
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 
@@ -25,22 +28,29 @@ class WasmToolWindowFactory : ToolWindowFactory {
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         val wasmToolWindow = WasmToolWindow(toolWindow)
         map = wasmToolWindow
-        val content = contentFactory.createContent(wasmToolWindow.getContent(), null, false)
+
+
+        val content = contentFactory.createContent(wasmToolWindow.getContent(), "Contract", false)
         wasmService.contractList.forEach {
-            wasmToolWindow.addContract(WasmContract(it.contractAddress,it.chainName,it.signer).apply {
-                setWasmContractActionListener(object :WasmContract.WasmContractActionListener{
+            wasmToolWindow.addContract(WasmContract(it.contractAddress, it.chainName, it.signer).apply {
+                setWasmContractActionListener(object : WasmContract.WasmContractActionListener {
                     override fun execute(signer: String?, contractAddress: String?, executeMsg: String?, chain: String?): String {
-                       return wasmService.executeWasmContract(chain,contractAddress,signer,executeMsg)
+                        return wasmService.executeWasmContract(chain, contractAddress, signer, executeMsg)
                     }
 
                     override fun query(contractAddress: String?, queryMsg: String?, chain: String?): String {
-                        return wasmService.queryWasmContract(chain,contractAddress,queryMsg)
+                        return wasmService.queryWasmContract(chain, contractAddress, queryMsg)
                     }
-                } )
+                })
             })
         }
+
         toolWindow.contentManager.addContent(content)
 
+        val networkPanel = WasmToolWindowNetworkPanel(true, true)
+        toolWindow.contentManager.addContent(contentFactory.createContent(networkPanel, "Network", false))
+        val signerPanel = WasmToolWindowSignerPanel()
+        toolWindow.contentManager.addContent(contentFactory.createContent(signerPanel,"Signer",false))
     }
 
     override fun shouldBeAvailable(project: Project) = true
@@ -50,7 +60,7 @@ class WasmToolWindowFactory : ToolWindowFactory {
         lateinit var map: WasmToolWindow
     }
 
-    fun getWasmToolWindow():WasmToolWindow {
+    fun getWasmToolWindow(): WasmToolWindow {
         return map
     }
 
@@ -58,7 +68,8 @@ class WasmToolWindowFactory : ToolWindowFactory {
 
 class WasmToolWindow(toolWindow: ToolWindow) {
     private val container = JPanel()
-    private val map = HashMap<String,WasmContract>()
+    private val map = HashMap<String, WasmContract>()
+
     init {
         container.apply {
             layout = VerticalFlowLayout()

@@ -25,14 +25,24 @@ public class WasmService implements PersistentStateComponent<WasmService.WasmSta
 
     }
 
-    public String deployWasmContract(String network, String wasmFile, String account, String initMsg) {
+    public String deployWasmContract(String network, String wasmFile, String signerName, String initMsg) {
         var net = networkHashMap.get(network);
         if (net == null) {
             return null;
         }
 
+        Signer signer = null;
+        for (int i = 0; i < wasmState.signerList.size(); i++) {
+            if (wasmState.signerList.get(i).equals(signerName)) {
+                signer = wasmState.signerList.get(i);
+            }
+        }
+        if (signer == null) {
+            return null;
+        }
+
         WasmClient wasmClient = new WasmClient(net.getUrl(), net.getChainId(), net.getTxMode());
-        return wasmClient.deployWasmContract(account, wasmFile, initMsg);
+        return wasmClient.deployWasmContract(signer.value, wasmFile, initMsg);
     }
 
     public String executeWasmContract(String network, String contractAddress, String account, String executeMsg) {
@@ -76,14 +86,26 @@ public class WasmService implements PersistentStateComponent<WasmService.WasmSta
         return this.wasmState.networkList;
     }
 
+    public List<Signer> getSignerList() {
+        return this.wasmState.signerList;
+    }
+
+
+    public void addSigner(WasmService.Signer signer) {
+        this.wasmState.signerList.add(signer);
+    }
+
 
     static class WasmState {
         public List<WasmContract> contractList;
         public List<Network> networkList;
 
+        private List<Signer> signerList;
+
         public WasmState() {
             this.contractList = new ArrayList<>();
             this.networkList = new ArrayList<>();
+            this.signerList = new ArrayList<>();
         }
 
         public WasmState(List<WasmContract> contractList, List<Network> networkList) {
@@ -159,4 +181,53 @@ public class WasmService implements PersistentStateComponent<WasmService.WasmSta
         }
     }
 
+    public static class Signer {
+        public String name;
+        public String value;
+
+        public Signer() {
+        }
+
+        public Signer(String name, String value) {
+            this.name = name;
+            this.value = value;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Signer signer = (Signer) o;
+            return Objects.equals(name, signer.name) && Objects.equals(value, signer.value);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(name, value);
+        }
+
+        @Override
+        public String toString() {
+            return "Signer{" +
+                    "name='" + name + '\'' +
+                    ", value='" + value + '\'' +
+                    '}';
+        }
+    }
 }

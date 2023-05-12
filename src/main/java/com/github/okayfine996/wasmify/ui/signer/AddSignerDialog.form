@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.github.okayfine996.wasmify.actions.DeployWasmContractDialog">
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.github.okayfine996.wasmify.ui.signer.AddSignerDialog">
   <grid id="cbd77" binding="contentPane" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="10" left="10" bottom="10" right="10"/>
     <constraints>
-      <xy x="48" y="54" width="436" height="300"/>
+      <xy x="48" y="54" width="436" height="297"/>
     </constraints>
     <properties>
-      <minimumSize width="400" height="300"/>
-      <preferredSize width="400" height="300"/>
+      <preferredSize width="600" height="300"/>
     </properties>
     <border type="none"/>
     <children>
@@ -37,7 +36,6 @@
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <actionCommand value="Deploy"/>
                   <text value="OK"/>
                 </properties>
               </component>
@@ -53,7 +51,7 @@
           </grid>
         </children>
       </grid>
-      <grid id="e3588" layout-manager="GridLayoutManager" row-count="5" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="e3588" layout-manager="GridLayoutManager" row-count="3" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -61,54 +59,29 @@
         <properties/>
         <border type="none"/>
         <children>
-          <component id="75aaf" class="com.intellij.openapi.ui.LabeledComponent" binding="Network" custom-create="true">
+          <component id="da559" class="com.intellij.openapi.ui.LabeledComponent" binding="name">
             <constraints>
-              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="7" anchor="0" fill="1" indent="0" use-parent-layout="false">
-                <maximum-size width="1000" height="-1"/>
-              </grid>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <labelLocation value="West"/>
-              <name value=""/>
-              <text value="Network"/>
+              <text value="name"/>
             </properties>
           </component>
-          <vspacer id="afdb6">
-            <constraints>
-              <grid row="4" column="0" row-span="1" col-span="2" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
-            </constraints>
-          </vspacer>
-          <component id="cc633" class="com.intellij.openapi.ui.LabeledComponent" binding="wasmFile" custom-create="true">
+          <component id="76f68" class="com.intellij.openapi.ui.LabeledComponent" binding="value">
             <constraints>
               <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <labelInsets top="0" left="0" bottom="0" right="5"/>
               <labelLocation value="West"/>
-              <text value="WasmFile"/>
+              <text value="value"/>
             </properties>
-            <clientProperties>
-              <html.disable class="java.lang.Boolean" value="false"/>
-            </clientProperties>
           </component>
-          <component id="53cf0" class="com.intellij.openapi.ui.LabeledComponent" binding="signer" custom-create="true">
+          <vspacer id="1b453">
             <constraints>
-              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
             </constraints>
-            <properties>
-              <labelLocation value="West"/>
-              <text value="Account"/>
-            </properties>
-          </component>
-          <component id="3d820" class="com.intellij.openapi.ui.LabeledComponent" binding="initMsg" custom-create="true">
-            <constraints>
-              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <labelLocation value="West"/>
-              <text value="InitMsg"/>
-            </properties>
-          </component>
+          </vspacer>
         </children>
       </grid>
     </children>

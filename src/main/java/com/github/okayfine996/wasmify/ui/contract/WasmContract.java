@@ -1,11 +1,7 @@
 package com.github.okayfine996.wasmify.ui.contract;
 
 import com.github.okayfine996.wasmify.notify.Notifier;
-import com.github.okayfine996.wasmify.service.WasmService;
-import com.intellij.execution.process.mediator.daemon.ProcessManager;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.ProgressIndicatorProvider;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
@@ -70,6 +66,9 @@ public class WasmContract {
         queryButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+
+
+
                 if (wasmContractActionListener != null) {
                     ProgressManager progressManager = ProgressManager.getInstance();
                     Project project = ProjectManager.getInstance().getDefaultProject();
@@ -85,7 +84,6 @@ public class WasmContract {
                 }
             }
         });
-
     }
 
     public String getContractAddress() {

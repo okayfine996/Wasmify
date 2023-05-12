@@ -12,7 +12,6 @@ import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.LabeledComponent;
 import com.intellij.openapi.ui.TextBrowseFolderListener;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
-import com.intellij.ui.components.JBTextField;
 import com.intellij.ui.components.fields.ExpandableTextField;
 import com.intellij.util.messages.MessageBus;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +27,7 @@ public class DeployWasmContractDialog extends JDialog {
     private LabeledComponent<ComboBox<String>> Network;
     private LabeledComponent<TextFieldWithBrowseButton> wasmFile;
     private LabeledComponent<ExpandableTextField> initMsg;
-    private LabeledComponent<JBTextField> account;
+    private LabeledComponent<ComboBox<String>> signer;
 
     private TextFieldWithBrowseButton wasmFileBrowseButton;
 
@@ -75,8 +74,8 @@ public class DeployWasmContractDialog extends JDialog {
         String network = this.Network.getComponent().getItem();
         String wasmFile = this.wasmFileBrowseButton.getText();
         String initMsg = this.initMsg.getComponent().getText();
-        String account = this.account.getComponent().getText();
-        ProgressManager.getInstance().run(new DeployWasmContractTask(project,network,wasmFile,initMsg,account));
+        String signer = this.signer.getComponent().getItem();
+        ProgressManager.getInstance().run(new DeployWasmContractTask(project,network,wasmFile,initMsg, signer));
         dispose();
     }
 
@@ -106,10 +105,10 @@ public class DeployWasmContractDialog extends JDialog {
         initMsgTextField.setEnabled(true);
         initMsg.setComponent(initMsgTextField);
 
-        account = new LabeledComponent<>();
-        JBTextField accountTextField = new JBTextField();
-        accountTextField.setEnabled(true);
-        account.setComponent(accountTextField);
+        signer = new LabeledComponent<>();
+        String[] signerArray= wasmService.getSignerList().stream().map(WasmService.Signer::getName).toArray(String[]::new);
+        ComboBox<String> signerCombox = new ComboBox<>(signerArray);
+        signer.setComponent(signerCombox);
     }
 
 
