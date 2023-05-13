@@ -11,18 +11,21 @@ public class Network {
 
     private String denom;
 
-    private String url;
+    private String restURL;
+
+    private String explorerURL;
 
     private String txMode;
 
     public Network() {
     }
 
-    public Network(String name, String chainId, String denom, String url, String txMode) {
+    public Network(String name, String chainId, String restURL, String explorerURL, String denom, String txMode) {
         this.name = name;
         this.chainId = chainId;
         this.denom = denom;
-        this.url = url;
+        this.restURL = restURL;
+        this.explorerURL = explorerURL;
         this.txMode = txMode;
     }
 
@@ -50,12 +53,20 @@ public class Network {
         this.denom = denom;
     }
 
-    public String getUrl() {
-        return url;
+    public String getRestURL() {
+        return restURL;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setRestURL(String restURL) {
+        this.restURL = restURL;
+    }
+
+    public String getExplorerURL() {
+        return explorerURL;
+    }
+
+    public void setExplorerURL(String explorerURL) {
+        this.explorerURL = explorerURL;
     }
 
     public String getTxMode() {

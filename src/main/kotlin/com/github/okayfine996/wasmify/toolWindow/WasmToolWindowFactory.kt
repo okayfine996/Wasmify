@@ -62,8 +62,6 @@ class WasmToolWindowFactory : ToolWindowFactory {
         lateinit var map: WasmToolWindow
         var signerPanel = WasmToolWindowSignerPanel()
         var networkPanel = WasmToolWindowNetworkPanel(true, true)
-//        fun getSignerPanel() = signerPanel
-//        fun getNetworkPanel() = networkPanel
     }
 
     fun getWasmToolWindow(): WasmToolWindow {

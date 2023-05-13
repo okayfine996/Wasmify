@@ -26,6 +26,13 @@ class WasmToolWindowNetworkPanel(vertical: Boolean, borderless: Boolean) : Simpl
             dialog.show()
         }
     }
+
+    private var jList = JBList<Network>().apply {
+        setCellRenderer { list, value, index, isSelected, cellHasFocus ->
+            com.github.okayfine996.wasmify.ui.contract.Network(value.name,value.chainId,value.restURL,value.explorerURL,value.denom).content.apply {
+            }
+        }
+    }
     private val wasmService = ApplicationManager.getApplication().getService(WasmService::class.java);
 
     init {
@@ -33,20 +40,12 @@ class WasmToolWindowNetworkPanel(vertical: Boolean, borderless: Boolean) : Simpl
             layout = HorizontalLayout(10)
             add(addNetwork)
         }
-        var jList = JBList<Network>(wasmService.networkList)
-        
-        jList.setCellRenderer { list, value, index, isSelected, cellHasFocus ->
-            com.github.okayfine996.wasmify.ui.contract.Network(value.name,value.chainId,value.url,"",value.denom).content.apply {
-                if (isSelected) {
-//                    background = Color.gray
-//                    foreground = Color.gray
-                }
-            }
-        }
-
-        jList.dragEnabled = true
-
 
         setContent(jList)
+        jList.setListData(wasmService.networkList.toTypedArray())
+    }
+
+    fun updateJBList() {
+        jList.setListData(wasmService.networkList.toTypedArray())
     }
 }

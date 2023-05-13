@@ -1,5 +1,9 @@
 package com.github.okayfine996.wasmify.ui.network;
 
+import com.github.okayfine996.wasmify.model.Network;
+import com.github.okayfine996.wasmify.service.WasmService;
+import com.github.okayfine996.wasmify.toolWindow.WasmToolWindowFactory;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.ui.LabeledComponent;
 import com.intellij.ui.components.JBTextField;
 
@@ -56,6 +60,10 @@ public class AddNetworkDialog extends JDialog {
 
     private void onOK() {
         // add your code here
+        WasmService wasmService = ApplicationManager.getApplication().getService(WasmService.class);
+        Network network = new Network(name.getComponent().getText(),chainId.getComponent().getText(),restURL.getComponent().getText(),explorerURL.getComponent().getText(),denom.getComponent().getText(),"block");
+        wasmService.addNetwork(network);
+        WasmToolWindowFactory.Companion.getNetworkPanel().updateJBList();
         dispose();
     }
 
