@@ -23,11 +23,12 @@
               <text value="Name:"/>
             </properties>
           </component>
-          <component id="cfe3a" class="javax.swing.JTextField" binding="textField1" default-binding="true">
+          <component id="cfe3a" class="javax.swing.JTextField" binding="nameTextField">
             <constraints border-constraint="Center"/>
             <properties>
               <maximumSize width="200" height="2147483647"/>
               <preferredSize width="200" height="30"/>
+              <text value=""/>
             </properties>
           </component>
         </children>
@@ -50,7 +51,7 @@
               <text value="Crate:"/>
             </properties>
           </component>
-          <component id="20032" class="javax.swing.JTextField" binding="textField2" default-binding="true">
+          <component id="20032" class="javax.swing.JTextField" binding="crateTextField">
             <constraints border-constraint="Center"/>
             <properties/>
           </component>
@@ -69,7 +70,7 @@
               <text value="Author:"/>
             </properties>
           </component>
-          <component id="19be6" class="javax.swing.JTextField" default-binding="true">
+          <component id="19be6" class="javax.swing.JTextField" binding="authorTextField">
             <constraints border-constraint="Center"/>
             <properties/>
           </component>

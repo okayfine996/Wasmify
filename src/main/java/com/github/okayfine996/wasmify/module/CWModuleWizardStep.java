@@ -1,8 +1,10 @@
 package com.github.okayfine996.wasmify.module;
 
 import com.github.okayfine996.wasmify.run.deploy.configuration.WasmRunDeploySettingsEditor;
+import com.github.okayfine996.wasmify.ui.newproject.ConfigurationData;
 import com.github.okayfine996.wasmify.ui.newproject.NewProject;
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
+import com.intellij.ide.util.projectWizard.WizardContext;
 import com.intellij.ide.wizard.CommitStepException;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.LabeledComponent;
@@ -24,23 +26,25 @@ import java.beans.PropertyChangeListener;
 
 public class CWModuleWizardStep extends ModuleWizardStep {
 
-    private LabeledComponent<TextFieldWithBrowseButton> myScriptName;
+    private WizardContext context;
+    private NewProject newProject = new NewProject();
+
+    public CWModuleWizardStep(WizardContext context) {
+        this.context = context;
+    }
 
     @Override
     public JComponent getComponent() {
-        NewProject newProject = new NewProject();
         return newProject.getCreateUI();
     }
 
     @Override
     public void updateDataModel() {
-
+        ConfigurationData data = newProject.getData();
+        if (context.getProjectBuilder() instanceof CWModuleBuilder) {
+            ((CWModuleBuilder) context.getProjectBuilder()).setConfigurationData(data);
+        }
     }
-
-    public CWModuleWizardStep() {
-        super();
-    }
-
 
     @Override
     public boolean validate() throws ConfigurationException {
