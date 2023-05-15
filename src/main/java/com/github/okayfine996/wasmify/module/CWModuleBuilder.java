@@ -48,27 +48,20 @@ public class CWModuleBuilder extends ModuleBuilder {
     @Override
     public void setupRootModel(@NotNull ModifiableRootModel modifiableRootModel) throws ConfigurationException {
         VirtualFile root = doAddContentEntry(modifiableRootModel).getFile();
-
-        System.out.println(modifiableRootModel);
-
-
-        String[] command = new String[]{"git", "clone", "https://github.com/CosmWasm/cw-template.git", "."};
-        command = new String[]{"cargo", "genrate", "--git", "https://github.com/CosmWasm/cw-template.git", "--name", "dapp"};
-
+        String name = modifiableRootModel.getProject().getName();
+        String[] command = new String[]{"cargo", "generate", "--git", "https://gitee.com/tainrandai/cw-template.git", "--name", name,"-d","minimal=false","--init"};
         GeneralCommandLine commandLine = new GeneralCommandLine(command);
         commandLine.setWorkDirectory(root.getPath());
         try {
             int code = commandLine.createProcess().waitFor();
             if (code != 0) {
-                return;
+                throw new ConfigurationException("generate from template failed");
             }
-            System.out.println(code);
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            throw new ConfigurationException("generate from template failed");
         } catch (com.intellij.execution.ExecutionException e) {
-            throw new RuntimeException(e);
+            throw new ConfigurationException("generate from template failed");
         }
-
     }
 
     public void setConfigurationData(ConfigurationData configurationData) {
