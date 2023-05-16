@@ -13,6 +13,8 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
@@ -52,15 +54,26 @@ public class CWModuleBuilder extends ModuleBuilder {
         String[] command = new String[]{"cargo", "generate", "--git", "https://gitee.com/tainrandai/cw-template.git", "--name", name,"-d","minimal=false","--init"};
         GeneralCommandLine commandLine = new GeneralCommandLine(command);
         commandLine.setWorkDirectory(root.getPath());
-        try {
-            int code = commandLine.createProcess().waitFor();
-            if (code != 0) {
-                throw new ConfigurationException("generate from template failed");
+
+
+        final int[] code = {-1};
+        Task.Modal modal = new Task.Modal(modifiableRootModel.getProject(),"Generate from template...",true) {
+            @Override
+            public void run(@NotNull ProgressIndicator indicator) {
+                indicator.setIndeterminate(true);
+                try {
+                     code[0] = commandLine.createProcess().waitFor();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (com.intellij.execution.ExecutionException e) {
+                    e.printStackTrace();
+                }
             }
-        } catch (InterruptedException e) {
-            throw new ConfigurationException("generate from template failed");
-        } catch (com.intellij.execution.ExecutionException e) {
-            throw new ConfigurationException("generate from template failed");
+        };
+
+        modal.queue();
+        if (code[0]!=0) {
+            throw new ConfigurationException("Generate failed");
         }
     }
 
