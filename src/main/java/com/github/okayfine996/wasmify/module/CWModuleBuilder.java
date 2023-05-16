@@ -23,6 +23,7 @@ import org.rust.cargo.toolchain.RustChannel;
 
 import java.io.*;
 import java.net.URI;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -53,11 +54,15 @@ public class CWModuleBuilder extends ModuleBuilder {
 
 
         String[] command = new String[]{"git", "clone", "https://github.com/CosmWasm/cw-template.git", "."};
-        command = new String[]{"cargo", "genrate", "--git", "https://github.com/CosmWasm/cw-template.git", "--name", "dapp"};
+        command = new String[]{"cargo", "generate", "--git", "https://gitee.com/tainrandai/cw-template", "--name", "dapp"};
 
         GeneralCommandLine commandLine = new GeneralCommandLine(command);
         commandLine.setWorkDirectory(root.getPath());
+
+
+
         try {
+
             int code = commandLine.createProcess().waitFor();
             if (code != 0) {
                 return;
