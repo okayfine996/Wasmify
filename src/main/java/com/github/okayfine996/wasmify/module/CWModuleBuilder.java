@@ -8,6 +8,7 @@ import com.intellij.ide.CommandLineProcessor;
 import com.intellij.ide.CommandLineProcessorResult;
 import com.intellij.ide.util.projectWizard.ModuleBuilder;
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
+import com.intellij.ide.util.projectWizard.SettingsStep;
 import com.intellij.ide.util.projectWizard.WizardContext;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.module.Module;
@@ -16,7 +17,9 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.roots.ModifiableRootModel;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.util.messages.MessageBus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.rust.cargo.toolchain.BacktraceMode;
@@ -42,9 +45,32 @@ public class CWModuleBuilder extends ModuleBuilder {
 
     @Override
     public @Nullable ModuleWizardStep getCustomOptionsStep(WizardContext context, Disposable parentDisposable) {
+
+        context.addContextListener(new WizardContext.Listener() {
+            @Override
+            public void nextStepRequested() {
+                WizardContext.Listener.super.nextStepRequested();
+            }
+        });
         CWModuleWizardStep cwModuleWizardStep = new CWModuleWizardStep(context);
         return cwModuleWizardStep;
     }
+
+
+    public boolean checkInstallCargoGenerate() {
+        int code = -1;
+        try {
+            code = Runtime.getRuntime().exec(new String[]{"cargo", "generate", "-V"}).waitFor();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return code == 0;
+    }
+
+
+
+
 
 
     @Override

@@ -1,5 +1,6 @@
 package com.github.okayfine996.wasmify.module;
 
+import com.github.okayfine996.wasmify.notify.Notifier;
 import com.github.okayfine996.wasmify.run.deploy.configuration.WasmRunDeploySettingsEditor;
 import com.github.okayfine996.wasmify.ui.newproject.ConfigurationData;
 import com.github.okayfine996.wasmify.ui.newproject.NewProject;
@@ -12,6 +13,7 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.ui.LabeledComponent;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.ui.components.ActionLink;
 import com.intellij.ui.components.JBLabel;
@@ -56,9 +58,16 @@ public class CWModuleWizardStep extends ModuleWizardStep {
         }
     }
 
+
+
+
     @Override
     public boolean validate() throws ConfigurationException {
-        return checkInstallCargoGenerate();
+        if (!checkInstallCargoGenerate()){
+            Messages.showMessageDialog("Cargo Generate Ins't Installed", "", Messages.getErrorIcon());
+           return false;
+        }
+        return true;
     }
 
 

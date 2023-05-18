@@ -31,7 +31,7 @@ public class WasmBuildConfiguration extends RunConfigurationBase<WasmBuildConfig
         return new CommandLineState(environment) {
             @Override
             protected @NotNull ProcessHandler startProcess() throws ExecutionException {
-                String cmd = "cargo wasm --lib";
+                String cmd = "cargo wasm";
 
                 GeneralCommandLine commandLine = new GeneralCommandLine(ParametersListUtil.parse(cmd));
                 commandLine.setWorkDirectory(environment.getProject().getBasePath());
