@@ -1,6 +1,8 @@
 package com.github.okayfine996.wasmify.module;
 
+import com.github.okayfine996.wasmify.run.deploy.configuration.WasmRunDeployConfigurationType;
 import com.github.okayfine996.wasmify.ui.newproject.ConfigurationData;
+import com.intellij.execution.RunManager;
 import com.intellij.execution.configuration.EnvironmentVariablesData;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.ide.CliResult;
@@ -101,6 +103,12 @@ public class CWModuleBuilder extends ModuleBuilder {
         if (code[0]!=0) {
             throw new ConfigurationException("Generate failed");
         }
+
+
+        var runManager = RunManager.getInstance(modifiableRootModel.getProject());
+        var configuration = runManager.createConfiguration("Build",WasmRunDeployConfigurationType.class);
+        runManager.addConfiguration(configuration);
+        runManager.setSelectedConfiguration(configuration);
     }
 
     public void setConfigurationData(ConfigurationData configurationData) {

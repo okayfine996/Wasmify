@@ -68,6 +68,9 @@ public class WasmService implements PersistentStateComponent<WasmService.WasmSta
     @Override
     public void loadState(@NotNull WasmState state) {
         this.wasmState = state;
+        if (state.networkMap.size() == 0) {
+            addBuiltInNetworks();
+        }
     }
 
 
@@ -89,7 +92,7 @@ public class WasmService implements PersistentStateComponent<WasmService.WasmSta
     }
 
     public void addNetwork(Network network) {
-        this.wasmState.networkMap.put(network.getChainId(), network);
+        this.wasmState.networkMap.put(network.getName(), network);
     }
 
 
@@ -117,6 +120,18 @@ public class WasmService implements PersistentStateComponent<WasmService.WasmSta
         public int hashCode() {
             return Objects.hash(contractMap, networkMap, signerMap);
         }
+    }
+
+
+    private void addBuiltInNetworks() {
+        var okbtest = new Network("okbtestnet", "okbchaintest-195", "https://okbtestrpc.okbchain.org", "https://www.oklink.com/cn/okbc-test", "okb", "block");
+        this.wasmState.networkMap.put(okbtest.getName(), okbtest);
+
+        var oktctest = new Network("oktctestnet", "exchain-65", "https://exchaintestrpc.okex.org", "https://www.oklink.com/cn/oktc-test", "okt", "block");
+        this.wasmState.networkMap.put(oktctest.getName(), oktctest);
+
+        var oktcmainnet = new Network("oktc", "exchain-66", "https://exchainrpc.okex.org", "https://www.oklink.com/cn/oktc", "okt", "denom");
+        this.wasmState.networkMap.put(oktcmainnet.getName(), oktcmainnet);
     }
 
     public static class WasmContract {
@@ -195,10 +210,7 @@ public class WasmService implements PersistentStateComponent<WasmService.WasmSta
 
         @Override
         public String toString() {
-            return "Signer{" +
-                    "name='" + name + '\'' +
-                    ", value='" + value + '\'' +
-                    '}';
+            return "Signer{" + "name='" + name + '\'' + ", value='" + value + '\'' + '}';
         }
     }
 }

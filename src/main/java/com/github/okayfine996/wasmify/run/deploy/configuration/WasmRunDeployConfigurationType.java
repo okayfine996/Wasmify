@@ -3,6 +3,7 @@ package com.github.okayfine996.wasmify.run.deploy.configuration;
 import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.configurations.ConfigurationType;
 import com.intellij.icons.AllIcons;
+import icons.SdkIcons;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -18,12 +19,12 @@ public class WasmRunDeployConfigurationType implements ConfigurationType {
 
     @Override
     public @Nls(capitalization = Nls.Capitalization.Sentence) String getConfigurationTypeDescription() {
-        return "deploy";
+        return "Build Wasm";
     }
 
     @Override
     public Icon getIcon() {
-        return AllIcons.General.Information;
+        return SdkIcons.Sdk_default_icon;
     }
 
     @Override

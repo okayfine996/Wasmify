@@ -22,9 +22,6 @@ class WasmToolWindowFactory : ToolWindowFactory {
         thisLogger().warn("Don't forget to remove all non-needed sample code files with their corresponding registration entries in `plugin.xml`.")
     }
 
-//    private val networkPanel = WasmToolWindowNetworkPanel(true, true)
-//    private val signerPanel = WasmToolWindowSignerPanel()
-
     private val contentFactory = ContentFactory.SERVICE.getInstance()
     private val wasmService = ApplicationManager.getApplication().getService(WasmService::class.java)
 

@@ -4,6 +4,7 @@ package com.github.okayfine996.wasmify.cmwasm.core;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.okayfine996.wasmify.cmwasm.utils.Utils;
+import com.github.okayfine996.wasmify.cmwasm.utils.crypto.AddressConvertUtil;
 import com.github.okayfine996.wasmify.cmwasm.utils.crypto.Crypto;
 import com.github.okayfine996.wasmify.cmwasm.utils.crypto.PrivateKey;
 import com.github.okayfine996.wasmify.cmwasm.wasm.msg.BaseMsg;
@@ -26,6 +27,7 @@ public class Signer {
     private String chainId;
     protected String accountNum;
     protected PrivateKey privateKey;
+
 
     public Signer(String privateKey) {
         this.privateKey = new PrivateKey(privateKey);
@@ -105,5 +107,9 @@ public class Signer {
 
     public String getAddress() {
         return this.privateKey.getAddress();
+    }
+
+    public String getHexAddress() {
+        return AddressConvertUtil.convertAddressFromBech32ToHex(this.privateKey.getAddress());
     }
 }

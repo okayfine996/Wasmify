@@ -90,7 +90,7 @@ public class DeployWasmContractDialog extends JDialog {
     private void createUIComponents() {
         Network = new LabeledComponent<>();
         WasmService wasmService = ApplicationManager.getApplication().getService(WasmService.class);
-        String[] comboxItems = wasmService.getNetworkList().stream().map(com.github.okayfine996.wasmify.model.Network::getChainId).toArray(String[]::new);
+        String[] comboxItems = wasmService.getNetworkList().stream().map(com.github.okayfine996.wasmify.model.Network::getName).toArray(String[]::new);
         ComboBox<String> networkCombox = new ComboBox<>(comboxItems);
 
         Network.setComponent(networkCombox);

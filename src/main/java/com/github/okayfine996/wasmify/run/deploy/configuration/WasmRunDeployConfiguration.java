@@ -13,6 +13,7 @@ import com.intellij.execution.runners.ProgramRunner;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.NlsActions;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,7 +33,10 @@ public class WasmRunDeployConfiguration extends LocatableConfigurationBase<WasmR
             @NotNull
             @Override
             protected ProcessHandler startProcess() throws ExecutionException {
-                GeneralCommandLine commandLine = new GeneralCommandLine("cargo","wasm");
+                GeneralCommandLine commandLine = new GeneralCommandLine("cargo", "wasm");
+                if (!StringUtils.isEmpty(getOptions().getExtralParameter())) {
+                    commandLine.addParameter(getOptions().getExtralParameter());
+                }
                 commandLine.setWorkDirectory(environment.getProject().getBasePath());
                 OSProcessHandler processHandler = ProcessHandlerFactory.getInstance().createColoredProcessHandler(commandLine);
                 ProcessTerminatedListener.attach(processHandler);
@@ -47,11 +51,8 @@ public class WasmRunDeployConfiguration extends LocatableConfigurationBase<WasmR
     }
 
 
-
-
-
     @Override
     protected @NotNull WasmRunDeployConfigurationOption getOptions() {
-        return (WasmRunDeployConfigurationOption)super.getOptions();
+        return (WasmRunDeployConfigurationOption) super.getOptions();
     }
 }

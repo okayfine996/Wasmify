@@ -33,12 +33,12 @@ public class CWModuleType extends ModuleType<CWModuleBuilder> {
 
     @Override
     public @NotNull @Nls(capitalization = Nls.Capitalization.Title) String getName() {
-        return "WASM Contract";
+        return "CosmWasm";
     }
 
     @Override
     public @NotNull @Nls(capitalization = Nls.Capitalization.Sentence) String getDescription() {
-        return "WASM Contract";
+        return "CosmWasm";
     }
 
     @Override
