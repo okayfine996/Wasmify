@@ -8,10 +8,13 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.DataProvider
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.ui.SimpleToolWindowPanel
+import com.intellij.openapi.ui.VerticalFlowLayout
 import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBPanel
+import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.panels.HorizontalLayout
 import java.awt.Toolkit
+import java.util.stream.Collectors
 import javax.swing.JButton
 
 class WasmToolWindowSignerPanel : SimpleToolWindowPanel(true) {
@@ -27,9 +30,7 @@ class WasmToolWindowSignerPanel : SimpleToolWindowPanel(true) {
         }
     }
 
-    private var jbList = JBList<Signer>().apply {
-        setCellRenderer { list, value, index, isSelected, cellHasFocus ->  SignerCell(value.name,value.value).content}
-    }
+    var container = JBPanel<JBPanel<*>>(VerticalFlowLayout())
 
     private val wasmService = ApplicationManager.getApplication().getService(WasmService::class.java);
 
@@ -39,12 +40,14 @@ class WasmToolWindowSignerPanel : SimpleToolWindowPanel(true) {
             add(addNetwork)
         }
 
-        jbList.setListData(wasmService.signerList.toTypedArray())
 
-        setContent(jbList)
+
+        wasmService.signerList.stream().map { SignerCell(it.name,it.value) }.forEach{container.add(it.content)}
+        setContent(JBScrollPane(container))
     }
 
     fun updateList() {
-        jbList.setListData(wasmService.signerList.toTypedArray())
+        container.removeAll()
+        wasmService.signerList.stream().map { SignerCell(it.name,it.value) }.forEach{container.add(it.content)}
     }
 }

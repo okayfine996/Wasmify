@@ -9,6 +9,8 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBPanel
+import com.intellij.ui.components.JBScrollBar
+import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.panels.HorizontalLayout
 import java.awt.Color
 import java.awt.Toolkit
@@ -41,7 +43,7 @@ class WasmToolWindowNetworkPanel(vertical: Boolean, borderless: Boolean) : Simpl
             add(addNetwork)
         }
 
-        setContent(jList)
+        setContent(JBScrollPane(jList))
         jList.setListData(wasmService.networkList.toTypedArray())
     }
 

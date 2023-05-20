@@ -1,17 +1,26 @@
 package com.github.okayfine996.wasmify.ui.signer;
 
 import com.github.okayfine996.wasmify.cmwasm.core.Signer;
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.ui.LabeledComponent;
+import com.intellij.ui.components.IconLabelButton;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPasswordField;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 
-public class SignerCell {
+public class SignerCell implements ClipboardOwner {
     private LabeledComponent name;
     private LabeledComponent value;
     private JPanel rootPanel;
-    private LabeledComponent addressLabeledComponent;
+    private LabeledComponent<JBLabel> addressLabeledComponent;
+    private IconLabelButton addressCopy;
+    private IconLabelButton valueCopy;
 
     public SignerCell(String name,String value) {
         this.name.setComponent(new JBLabel(name));
@@ -25,5 +34,27 @@ public class SignerCell {
 
     public JComponent getContent() {
         return this.rootPanel;
+    }
+
+    private void createUIComponents() {
+
+        addressCopy = new IconLabelButton(AllIcons.Actions.Copy,jComponent -> {
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            StringSelection stringSelection = new StringSelection(addressLabeledComponent.getComponent().getText());
+            clipboard.setContents(stringSelection,SignerCell.this);
+            return null;
+        });
+
+        valueCopy = new IconLabelButton(AllIcons.Actions.Copy, jComponent -> {
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            StringSelection stringSelection = new StringSelection(addressLabeledComponent.getComponent().getText());
+            clipboard.setContents(stringSelection,SignerCell.this);
+            return null;
+        });
+    }
+
+    @Override
+    public void lostOwnership(Clipboard clipboard, Transferable contents) {
+
     }
 }
