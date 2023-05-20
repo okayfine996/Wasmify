@@ -1,5 +1,6 @@
 package com.github.okayfine996.wasmify.service;
 
+import com.github.okayfine996.wasmify.cmwasm.wasm.Fund;
 import com.github.okayfine996.wasmify.cmwasm.wasm.WasmClient;
 import com.github.okayfine996.wasmify.model.Network;
 import com.intellij.openapi.components.PersistentStateComponent;
@@ -22,7 +23,7 @@ public class WasmService implements PersistentStateComponent<WasmService.WasmSta
 
     }
 
-    public String deployWasmContract(String network, String wasmFile, String signerName, String initMsg) {
+    public String deployWasmContract(String network, String wasmFile, String signerName, String initMsg,String fee, String gas, List<Fund> funds) {
         var net = wasmState.networkMap.get(network);
         if (net == null) {
             return null;
@@ -34,10 +35,10 @@ public class WasmService implements PersistentStateComponent<WasmService.WasmSta
         }
 
         WasmClient wasmClient = new WasmClient(net.getRestURL(), net.getChainId(), net.getTxMode());
-        return wasmClient.deployWasmContract(signer.value, wasmFile, initMsg);
+        return wasmClient.deployWasmContract(signer.value, wasmFile, initMsg, fee, net.getDenom(), gas, funds);
     }
 
-    public String executeWasmContract(String network, String contractAddress, String signerName, String executeMsg) {
+    public String executeWasmContract(String network, String contractAddress, String signerName, String executeMsg, String fee, String gas, List<Fund> funds) {
         var net = wasmState.networkMap.get(network);
         if (net == null) {
             return null;
@@ -48,7 +49,7 @@ public class WasmService implements PersistentStateComponent<WasmService.WasmSta
             return null;
         }
         WasmClient wasmClient = new WasmClient(net.getRestURL(), net.getChainId(), net.getTxMode());
-        return wasmClient.executeWasmContract(signer.value, contractAddress, executeMsg);
+        return wasmClient.executeWasmContract(signer.value, contractAddress, executeMsg, fee, net.getDenom(), gas, funds);
     }
 
     public String queryWasmContract(String network, String contractAddress, String queryMsg) {
@@ -93,6 +94,10 @@ public class WasmService implements PersistentStateComponent<WasmService.WasmSta
 
     public void addNetwork(Network network) {
         this.wasmState.networkMap.put(network.getName(), network);
+    }
+
+    public void addContract(WasmContract contract) {
+        this.wasmState.contractMap.put(contract.contractAddress, contract);
     }
 
 

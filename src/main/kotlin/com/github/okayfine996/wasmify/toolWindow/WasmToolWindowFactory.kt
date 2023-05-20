@@ -1,5 +1,6 @@
 package com.github.okayfine996.wasmify.toolWindow
 
+import com.github.okayfine996.wasmify.cmwasm.wasm.Fund
 import com.github.okayfine996.wasmify.service.WasmService
 import com.github.okayfine996.wasmify.ui.contract.WasmContract
 import com.intellij.icons.AllIcons
@@ -34,13 +35,18 @@ class WasmToolWindowFactory : ToolWindowFactory {
         wasmService.contractList.forEach {
             wasmToolWindow.addContract(WasmContract(it.contractAddress, it.chainName, it.signer).apply {
                 setWasmContractActionListener(object : WasmContract.WasmContractActionListener {
-                    override fun execute(signer: String?, contractAddress: String?, executeMsg: String?, chain: String?): String {
-                        return wasmService.executeWasmContract(chain, contractAddress, signer, executeMsg)
+                    override fun execute(signer: String?, contractAddress: String?, executeMsg: String?, chain: String?, fee: String?, gas: String?, funds: MutableList<Fund>?): String {
+                        return wasmService.executeWasmContract(chain, contractAddress, signer, executeMsg, fee, gas, funds)
                     }
 
                     override fun query(contractAddress: String?, queryMsg: String?, chain: String?): String {
                         return wasmService.queryWasmContract(chain, contractAddress, queryMsg)
                     }
+
+                    override fun migrate(signer: String?, contractAddress: String?, migrateMsg: String?, chain: String?, wasmFile: String?, fee: String?, gas: String?, funds: MutableList<Fund>?): String {
+                        TODO("Not yet implemented")
+                    }
+
                 })
             })
         }
