@@ -11,8 +11,7 @@ import com.github.okayfine996.wasmify.cmwasm.wasm.msg.BaseMsg;
 import groovy.util.logging.Slf4j;
 import org.bouncycastle.util.Strings;
 import org.bouncycastle.util.encoders.Base64;
-import org.bouncycastle.util.encoders.Hex;
-import org.web3j.crypto.ECKeyPair;
+import org.bouncycastle.util.encoders.Hex;import org.web3j.crypto.ECKeyPair;
 import org.web3j.crypto.Sign;
 
 import java.math.BigInteger;
@@ -50,7 +49,7 @@ public class Signer {
         this.accountNum = accountNum;
     }
 
-    private StdTx buildUnsignedTx(BaseMsg msg, String feeAmount, String gas, String denom, String memo) {
+    private StdTx buildUnsignedTx(BaseMsg msg, String feeAmount, String gas, String memo, String nonce,String denom) {
         Fee fee = new Fee();
         List<Token> amountList = new ArrayList<>();
         Token token = new Token(Utils.NewDecString(feeAmount), denom);
@@ -68,8 +67,8 @@ public class Signer {
     }
 
 
-    public StdTx buildAndSignStdTx(BaseMsg msg, String feeAmount, String denom, String gas, String memo, String nonce) throws JsonProcessingException {
-        StdTx stdTx = buildUnsignedTx(msg, feeAmount, gas,denom, memo);
+    public StdTx buildAndSignStdTx(BaseMsg msg, String feeAmount, String gas, String memo, String nonce,String denom) throws JsonProcessingException {
+        StdTx stdTx = buildUnsignedTx(msg, feeAmount, gas, memo, nonce, denom);
         Signature signature = signTx(stdTx, nonce);
         stdTx.setSignatures(Arrays.asList(signature));
         return stdTx;

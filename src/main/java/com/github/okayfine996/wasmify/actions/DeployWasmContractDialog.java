@@ -84,7 +84,7 @@ public class DeployWasmContractDialog extends JDialog {
         String fee = this.feeLabel.getComponent().getText();
         String gas = this.gasLabel.getComponent().getNumber() + "";
         ProgressManager.getInstance()
-                .run(new DeployWasmContractTask(project, network, wasmFile, initMsg, signer,fee,gas, Collections.emptyList()));
+                .run(new DeployWasmContractTask(project, network, wasmFile, initMsg, signer,fee,gas, null));
         dispose();
     }
 
