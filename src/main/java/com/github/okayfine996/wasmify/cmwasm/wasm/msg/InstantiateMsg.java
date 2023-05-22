@@ -2,6 +2,7 @@ package com.github.okayfine996.wasmify.cmwasm.wasm.msg;
 
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.github.okayfine996.wasmify.cmwasm.wasm.Fund;
@@ -21,6 +22,7 @@ public class InstantiateMsg {
 
     @JsonProperty("funds")
     @SerializedName("funds")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<Fund> fund;
 
     @JsonProperty("label")

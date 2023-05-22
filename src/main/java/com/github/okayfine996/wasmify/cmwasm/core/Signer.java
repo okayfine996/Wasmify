@@ -4,6 +4,7 @@ package com.github.okayfine996.wasmify.cmwasm.core;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.okayfine996.wasmify.cmwasm.utils.Utils;
+import com.github.okayfine996.wasmify.cmwasm.utils.crypto.AddressConvertUtil;
 import com.github.okayfine996.wasmify.cmwasm.utils.crypto.Crypto;
 import com.github.okayfine996.wasmify.cmwasm.utils.crypto.PrivateKey;
 import com.github.okayfine996.wasmify.cmwasm.wasm.msg.BaseMsg;
@@ -27,6 +28,7 @@ public class Signer {
     protected String accountNum;
     protected PrivateKey privateKey;
 
+
     public Signer(String privateKey) {
         this.privateKey = new PrivateKey(privateKey);
     }
@@ -47,10 +49,10 @@ public class Signer {
         this.accountNum = accountNum;
     }
 
-    private StdTx buildUnsignedTx(BaseMsg msg, String feeAmount, String gas, String memo, String nonce) {
+    private StdTx buildUnsignedTx(BaseMsg msg, String feeAmount, String gas, String memo, String nonce,String denom) {
         Fee fee = new Fee();
         List<Token> amountList = new ArrayList<>();
-        Token token = new Token(Utils.NewDecString(feeAmount), "okb");
+        Token token = new Token(Utils.NewDecString(feeAmount), denom);
         amountList.add(token);
         fee.setAmount(amountList);
         fee.setGas(gas);
@@ -65,8 +67,8 @@ public class Signer {
     }
 
 
-    public StdTx buildAndSignStdTx(BaseMsg msg, String feeAmount, String gas, String memo, String nonce) throws JsonProcessingException {
-        StdTx stdTx = buildUnsignedTx(msg, feeAmount, gas, memo, nonce);
+    public StdTx buildAndSignStdTx(BaseMsg msg, String feeAmount, String gas, String memo, String nonce,String denom) throws JsonProcessingException {
+        StdTx stdTx = buildUnsignedTx(msg, feeAmount, gas, memo, nonce, denom);
         Signature signature = signTx(stdTx, nonce);
         stdTx.setSignatures(Arrays.asList(signature));
         return stdTx;
@@ -105,5 +107,9 @@ public class Signer {
 
     public String getAddress() {
         return this.privateKey.getAddress();
+    }
+
+    public String getHexAddress() {
+        return AddressConvertUtil.convertAddressFromBech32ToHex(this.privateKey.getAddress());
     }
 }

@@ -1,5 +1,6 @@
 package com.github.okayfine996.wasmify.service;
 
+import com.github.okayfine996.wasmify.cmwasm.wasm.Fund;
 import com.github.okayfine996.wasmify.cmwasm.wasm.WasmClient;
 import com.github.okayfine996.wasmify.model.Network;
 import com.intellij.openapi.components.PersistentStateComponent;
@@ -22,7 +23,7 @@ public class WasmService implements PersistentStateComponent<WasmService.WasmSta
 
     }
 
-    public String deployWasmContract(String network, String wasmFile, String signerName, String initMsg) {
+    public String deployWasmContract(String network, String wasmFile, String signerName, String initMsg,String fee, String gas, List<Fund> funds) {
         var net = wasmState.networkMap.get(network);
         if (net == null) {
             return null;
@@ -34,10 +35,10 @@ public class WasmService implements PersistentStateComponent<WasmService.WasmSta
         }
 
         WasmClient wasmClient = new WasmClient(net.getRestURL(), net.getChainId(), net.getTxMode());
-        return wasmClient.deployWasmContract(signer.value, wasmFile, initMsg);
+        return wasmClient.deployWasmContract(signer.value, wasmFile, initMsg, fee, net.getDenom(), gas, funds);
     }
 
-    public String executeWasmContract(String network, String contractAddress, String signerName, String executeMsg) {
+    public String executeWasmContract(String network, String contractAddress, String signerName, String executeMsg, String fee, String gas, List<Fund> funds) {
         var net = wasmState.networkMap.get(network);
         if (net == null) {
             return null;
@@ -48,7 +49,7 @@ public class WasmService implements PersistentStateComponent<WasmService.WasmSta
             return null;
         }
         WasmClient wasmClient = new WasmClient(net.getRestURL(), net.getChainId(), net.getTxMode());
-        return wasmClient.executeWasmContract(signer.value, contractAddress, executeMsg);
+        return wasmClient.executeWasmContract(signer.value, contractAddress, executeMsg, fee, net.getDenom(), gas, funds);
     }
 
     public String queryWasmContract(String network, String contractAddress, String queryMsg) {
@@ -68,6 +69,9 @@ public class WasmService implements PersistentStateComponent<WasmService.WasmSta
     @Override
     public void loadState(@NotNull WasmState state) {
         this.wasmState = state;
+        if (state.networkMap.size() == 0) {
+            addBuiltInNetworks();
+        }
     }
 
 
@@ -89,7 +93,11 @@ public class WasmService implements PersistentStateComponent<WasmService.WasmSta
     }
 
     public void addNetwork(Network network) {
-        this.wasmState.networkMap.put(network.getChainId(), network);
+        this.wasmState.networkMap.put(network.getName(), network);
+    }
+
+    public void addContract(WasmContract contract) {
+        this.wasmState.contractMap.put(contract.contractAddress, contract);
     }
 
 
@@ -117,6 +125,18 @@ public class WasmService implements PersistentStateComponent<WasmService.WasmSta
         public int hashCode() {
             return Objects.hash(contractMap, networkMap, signerMap);
         }
+    }
+
+
+    private void addBuiltInNetworks() {
+        var okbtest = new Network("okbtestnet", "okbchaintest-195", "https://okbtestrpc.okbchain.org", "https://www.oklink.com/cn/okbc-test", "okb", "block");
+        this.wasmState.networkMap.put(okbtest.getName(), okbtest);
+
+        var oktctest = new Network("oktctestnet", "exchain-65", "https://exchaintestrpc.okex.org", "https://www.oklink.com/cn/oktc-test", "okt", "block");
+        this.wasmState.networkMap.put(oktctest.getName(), oktctest);
+
+        var oktcmainnet = new Network("oktc", "exchain-66", "https://exchainrpc.okex.org", "https://www.oklink.com/cn/oktc", "okt", "denom");
+        this.wasmState.networkMap.put(oktcmainnet.getName(), oktcmainnet);
     }
 
     public static class WasmContract {
@@ -195,10 +215,7 @@ public class WasmService implements PersistentStateComponent<WasmService.WasmSta
 
         @Override
         public String toString() {
-            return "Signer{" +
-                    "name='" + name + '\'' +
-                    ", value='" + value + '\'' +
-                    '}';
+            return "Signer{" + "name='" + name + '\'' + ", value='" + value + '\'' + '}';
         }
     }
 }

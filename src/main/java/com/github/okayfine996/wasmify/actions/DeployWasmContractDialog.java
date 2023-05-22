@@ -1,24 +1,24 @@
 package com.github.okayfine996.wasmify.actions;
 
-import com.github.okayfine996.wasmify.listener.WasmServiceListener;
 import com.github.okayfine996.wasmify.service.WasmService;
+import com.github.okayfine996.wasmify.tasks.DeployWasmContractTask;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
-import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
-import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.LabeledComponent;
 import com.intellij.openapi.ui.TextBrowseFolderListener;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
+import com.intellij.ui.JBIntSpinner;
+import com.intellij.ui.JBSplitter;
+import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBTextField;
 import com.intellij.ui.components.fields.ExpandableTextField;
-import com.intellij.util.messages.MessageBus;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.event.*;
+import java.util.Collections;
 
 public class DeployWasmContractDialog extends JDialog {
     private JPanel contentPane;
@@ -28,6 +28,9 @@ public class DeployWasmContractDialog extends JDialog {
     private LabeledComponent<TextFieldWithBrowseButton> wasmFile;
     private LabeledComponent<ExpandableTextField> initMsg;
     private LabeledComponent<ComboBox<String>> signer;
+    private LabeledComponent<JBTextField> feeLabel;
+    private LabeledComponent<JBIntSpinner> gasLabel;
+    private JBLabel denomLabel;
 
     private TextFieldWithBrowseButton wasmFileBrowseButton;
 
@@ -78,7 +81,10 @@ public class DeployWasmContractDialog extends JDialog {
         String wasmFile = this.wasmFileBrowseButton.getText();
         String initMsg = this.initMsg.getComponent().getText();
         String signer = this.signer.getComponent().getItem();
-        ProgressManager.getInstance().run(new DeployWasmContractTask(project,network,wasmFile,initMsg, signer));
+        String fee = this.feeLabel.getComponent().getText();
+        String gas = this.gasLabel.getComponent().getNumber() + "";
+        ProgressManager.getInstance()
+                .run(new DeployWasmContractTask(project, network, wasmFile, initMsg, signer,fee,gas, null));
         dispose();
     }
 
@@ -88,9 +94,10 @@ public class DeployWasmContractDialog extends JDialog {
     }
 
     private void createUIComponents() {
-        Network = new LabeledComponent<>();
         WasmService wasmService = ApplicationManager.getApplication().getService(WasmService.class);
-        String[] comboxItems = wasmService.getNetworkList().stream().map(com.github.okayfine996.wasmify.model.Network::getChainId).toArray(String[]::new);
+
+        Network = new LabeledComponent<>();
+        String[] comboxItems = wasmService.getNetworkList().stream().map(com.github.okayfine996.wasmify.model.Network::getName).toArray(String[]::new);
         ComboBox<String> networkCombox = new ComboBox<>(comboxItems);
 
         Network.setComponent(networkCombox);
@@ -109,41 +116,17 @@ public class DeployWasmContractDialog extends JDialog {
         initMsg.setComponent(initMsgTextField);
 
         signer = new LabeledComponent<>();
-        String[] signerArray= wasmService.getSignerList().stream().map(WasmService.Signer::getName).toArray(String[]::new);
+        String[] signerArray = wasmService.getSignerList().stream().map(WasmService.Signer::getName).toArray(String[]::new);
         ComboBox<String> signerCombox = new ComboBox<>(signerArray);
         signer.setComponent(signerCombox);
-    }
 
 
-    class DeployWasmContractTask extends Task.Backgroundable {
-        private static final String TASK_NAME = "deploy wasm";
-        private Project project;
-        private String network;
-        private String wasmFile;
-        private String initMsg;
-        private String signer;
+        feeLabel = new LabeledComponent();
+        feeLabel.setComponent(new JBTextField());
 
-        public DeployWasmContractTask(@Nullable Project project, String network, String wasmFile, String initMsg, String signer) {
-            super(project, TASK_NAME);
-            this.project = project;
-            this.network = network;
-            this.wasmFile = wasmFile;
-            this.initMsg = initMsg;
-            this.signer = signer;
+        gasLabel = new LabeledComponent();
+        gasLabel.setComponent(new JBIntSpinner(200000, 21000,1000000000,10000));
+        denomLabel = new JBLabel("OKB");
 
-        }
-
-
-        @Override
-        public void run(@NotNull ProgressIndicator indicator) {
-            WasmService wasmService = ApplicationManager.getApplication().getService(WasmService.class);
-            var contractAddress = wasmService.deployWasmContract(network, wasmFile, signer, initMsg);
-
-            if (contractAddress != null) {
-                MessageBus messageBus = this.project.getMessageBus();
-                WasmServiceListener publisher = messageBus.syncPublisher(WasmServiceListener.TOPIC);
-                publisher.deployWasmEvent(signer, contractAddress, network);
-            }
-        }
     }
 }
