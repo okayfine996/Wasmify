@@ -4,6 +4,7 @@ import com.github.okayfine996.wasmify.cmwasm.wasm.Fund;
 import com.github.okayfine996.wasmify.notify.Notifier;
 import com.github.okayfine996.wasmify.service.WasmService;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
@@ -11,6 +12,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.LabeledComponent;
+import com.intellij.openapi.ui.TextBrowseFolderListener;
+import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.ui.JBIntSpinner;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextField;
@@ -34,6 +37,7 @@ public class WasmContract {
     private LabeledComponent signerLabel;
     private LabeledComponent chainName;
     private LabeledComponent<JBTextField> feeLabel;
+    private LabeledComponent<TextFieldWithBrowseButton> migrateLabel;
 
     private String signer;
     private String contractAddress;
@@ -62,11 +66,18 @@ public class WasmContract {
         ComboBox<String> signerCombox = new ComboBox<>(signerArray);
         signerLabel.setComponent(signerCombox);
 
+        excuteMsgTextField = new ExpandableTextField();
+
         gasLimitLabel = new LabeledComponent<JBIntSpinner>();
         gasLimitLabel.setComponent(new JBIntSpinner(3000000,21000,100000000,1000));
         feeLabel = new LabeledComponent<>();
-        feeLabel.setComponent(new JBTextField());
+        feeLabel.setComponent(new JBTextField("0.03"));
 
+        migrateLabel = new LabeledComponent<TextFieldWithBrowseButton>();
+        TextFieldWithBrowseButton wasmFileBrowseButton = new TextFieldWithBrowseButton();
+        wasmFileBrowseButton.addBrowseFolderListener(new TextBrowseFolderListener(new FileChooserDescriptor(true, false, false, false, false, false)));
+        wasmFileBrowseButton.setEditable(true);
+        migrateLabel.setComponent(wasmFileBrowseButton);
 
         executeButton = new JButton("EXECUTE");
         executeButton.addActionListener(new ActionListener() {

@@ -24,12 +24,13 @@ class WasmToolWindowFactory : ToolWindowFactory {
     }
 
     private val contentFactory = ContentFactory.SERVICE.getInstance()
-    private val wasmService = ApplicationManager.getApplication().getService(WasmService::class.java)
+
 
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         val wasmToolWindow = WasmToolWindow(toolWindow)
         map = wasmToolWindow
 
+        val wasmService = ApplicationManager.getApplication().getService(WasmService::class.java)
 
         val content = contentFactory.createContent(wasmToolWindow.getContent(), "Contract", false)
         wasmService.contractList.forEach {

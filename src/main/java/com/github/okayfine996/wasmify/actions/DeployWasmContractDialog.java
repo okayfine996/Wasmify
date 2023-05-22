@@ -94,6 +94,7 @@ public class DeployWasmContractDialog extends JDialog {
     }
 
     private void createUIComponents() {
+
         WasmService wasmService = ApplicationManager.getApplication().getService(WasmService.class);
 
         Network = new LabeledComponent<>();

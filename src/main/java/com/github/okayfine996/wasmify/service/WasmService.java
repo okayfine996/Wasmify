@@ -3,10 +3,7 @@ package com.github.okayfine996.wasmify.service;
 import com.github.okayfine996.wasmify.cmwasm.wasm.Fund;
 import com.github.okayfine996.wasmify.cmwasm.wasm.WasmClient;
 import com.github.okayfine996.wasmify.model.Network;
-import com.intellij.openapi.components.PersistentStateComponent;
-import com.intellij.openapi.components.Service;
-import com.intellij.openapi.components.State;
-import com.intellij.openapi.components.Storage;
+import com.intellij.openapi.components.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,8 +11,10 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-@State(name = "wasm", storages = @Storage("wasm.xml"))
-@Service(Service.Level.APP)
+import static com.intellij.openapi.components.StoragePathMacros.MODULE_FILE;
+
+@State(name = "wasmify",storages = {@Storage(roamingType = RoamingType.DISABLED,value = "wasmify.xml")})
+@Service(Service.Level.PROJECT)
 public class WasmService implements PersistentStateComponent<WasmService.WasmState> {
     private WasmState wasmState = new WasmState();
 
