@@ -8,12 +8,10 @@ import com.github.okayfine996.wasmify.cmwasm.core.Signer;
 import com.github.okayfine996.wasmify.cmwasm.core.StdTx;
 import com.github.okayfine996.wasmify.cmwasm.core.TxResponse;
 import com.github.okayfine996.wasmify.cmwasm.model.Account;
+import com.github.okayfine996.wasmify.cmwasm.results.MigrateResult;
 import com.github.okayfine996.wasmify.cmwasm.utils.Utils;
 import com.github.okayfine996.wasmify.cmwasm.utils.crypto.AddressConvertUtil;
-import com.github.okayfine996.wasmify.cmwasm.wasm.msg.BaseMsg;
-import com.github.okayfine996.wasmify.cmwasm.wasm.msg.ExecuteMsg;
-import com.github.okayfine996.wasmify.cmwasm.wasm.msg.InstantiateMsg;
-import com.github.okayfine996.wasmify.cmwasm.wasm.msg.StoreCodeMsg;
+import com.github.okayfine996.wasmify.cmwasm.wasm.msg.*;
 import okhttp3.*;
 import org.checkerframework.checker.units.qual.A;
 
@@ -63,7 +61,7 @@ public class WasmClient {
         return null;
     }
 
-    public int storeCode(String privateKey, String wasmFile,String feeAmount, String denom, String gas) throws IOException {
+    public int storeCode(String privateKey, String wasmFile, String feeAmount, String denom, String gas) throws IOException {
         byte[] wasmBinary = Utils.compressBytes(wasmFile);
         Signer signer = new Signer(privateKey);
         Account account = this.queryAccount(signer.getAddress());
@@ -78,7 +76,7 @@ public class WasmClient {
         String jsonStr = "{\"permission\":\"Everybody\"}";
         StoreCodeMsg storeCodeMsg = new StoreCodeMsg(Utils.getSortJson(jsonStr), signer.getAddress(), encodedWasmData);
 
-        StdTx stdTx = signer.buildAndSignStdTx(new BaseMsg<StoreCodeMsg>("wasm/MsgStoreCode", storeCodeMsg), feeAmount, gas, "", account.getSequence() + "",denom);
+        StdTx stdTx = signer.buildAndSignStdTx(new BaseMsg<StoreCodeMsg>("wasm/MsgStoreCode", storeCodeMsg), feeAmount, gas, "", account.getSequence() + "", denom);
         TxResponse txResponse = this.broadcastTx(stdTx, account.getSequence() + "");
         if (!txResponse.isSucceed()) {
             throw new RuntimeException(txResponse.toString());
@@ -91,7 +89,7 @@ public class WasmClient {
         return Integer.valueOf(log);
     }
 
-    public String instantiate(String privateKey, int codeId, String initMsg,String feeAmount, String denom, String gas,List<Fund> funds) throws IOException {
+    public String instantiate(String privateKey, int codeId, String initMsg, String feeAmount, String denom, String gas, List<Fund> funds) throws IOException {
         Signer signer = new Signer(privateKey);
         Account account = this.queryAccount(signer.getAddress());
         if (account == null) {
@@ -105,7 +103,7 @@ public class WasmClient {
         }
 
         InstantiateMsg instantiateMsg = new InstantiateMsg(AddressConvertUtil.convertFromBech32ToHex(signer.getAddress()), codeId + "", funds, "v1.0.0", Utils.getSortJson(initMsg), signer.getAddress());
-        StdTx stdTx = signer.buildAndSignStdTx(new BaseMsg<InstantiateMsg>("wasm/MsgInstantiateContract", instantiateMsg), feeAmount, gas, "", account.getSequence() + "",denom);
+        StdTx stdTx = signer.buildAndSignStdTx(new BaseMsg<InstantiateMsg>("wasm/MsgInstantiateContract", instantiateMsg), feeAmount, gas, "", account.getSequence() + "", denom);
         TxResponse txResponse = this.broadcastTx(stdTx, account.getSequence() + "");
         if (!txResponse.isSucceed()) {
             throw new RuntimeException(txResponse.toString());
@@ -117,10 +115,10 @@ public class WasmClient {
     }
 
 
-    public String deployWasmContract(String privateKey, String wasmFile, String initMsg,String feeAmount, String denom, String gas,List<Fund> funds) {
+    public String deployWasmContract(String privateKey, String wasmFile, String initMsg, String feeAmount, String denom, String gas, List<Fund> funds) {
         try {
-            int codeId = this.storeCode(privateKey, wasmFile,feeAmount,denom,gas);
-            String contractAddress = this.instantiate(privateKey, codeId, initMsg, feeAmount,denom,gas,funds);
+            int codeId = this.storeCode(privateKey, wasmFile, feeAmount, denom, gas);
+            String contractAddress = this.instantiate(privateKey, codeId, initMsg, feeAmount, denom, gas, funds);
             return contractAddress;
         } catch (IOException e) {
             e.printStackTrace();
@@ -129,7 +127,7 @@ public class WasmClient {
         return null;
     }
 
-    public String executeWasmContract(String privateKey, String contractAddress, String execMsg,String feeAmount, String denom, String gas,List<Fund> funds) {
+    public String executeWasmContract(String privateKey, String contractAddress, String execMsg, String feeAmount, String denom, String gas, List<Fund> funds) {
         Signer signer = new Signer(privateKey);
         Account account = this.queryAccount(signer.getAddress());
         if (account == null) {
@@ -180,14 +178,45 @@ public class WasmClient {
         return null;
     }
 
+    public MigrateResult migrateContract(String privateKey, String contractAddress, int codeId, String migrateMsgStr, String feeAmount, String denom, String gas, List<Fund> funds) {
+        Signer signer = new Signer(privateKey);
+        Account account = this.queryAccount(signer.getAddress());
+        if (account == null) {
+            throw new RuntimeException("query account failed");
+        }
+        signer.setAccountNum(account.getAccountNumber() + "");
+        signer.setChainId(this.chainId);
+
+        MigrateMsg migrateMsg = new MigrateMsg(String.valueOf(codeId), contractAddress, Utils.getSortJson(migrateMsgStr), signer.getAddress());
+        StdTx stdTx = null;
+        try {
+            stdTx = signer.buildAndSignStdTx(new BaseMsg<MigrateMsg>("wasm/MsgMigrateContract", migrateMsg), feeAmount, gas, "", account.getSequence() + "", denom);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        TxResponse txResponse = this.broadcastTx(stdTx, account.getSequence() + "");
+        return new MigrateResult(txResponse);
+    }
+
+
+    public MigrateResult upgradeContract(String privateKey, String contractAddress, String migrateFile, String migrateMsg, String feeAmount, String denom, String gas, List<Fund> funds) {
+        try {
+            int codeId = this.storeCode(privateKey, migrateFile, feeAmount, denom, gas);
+            return this.migrateContract(privateKey, contractAddress, codeId, migrateMsg, feeAmount, denom, gas, funds);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     public static void main(String[] args) {
         WasmClient client = new WasmClient("http://127.0.0.1:8545", "okbchain-67", "block");
         String wasmFile = "src/main/java/com/github/okayfine996/wasmify/cmwasm/wasm/hackatom.wasm";
         try {
-            int code = client.storeCode("8FF3CA2D9985C3A52B459E2F6E7822B23E1AF845961E22128D5F372FB9AA5F17", wasmFile,"0.03","okb","3000000");
+            int code = client.storeCode("8FF3CA2D9985C3A52B459E2F6E7822B23E1AF845961E22128D5F372FB9AA5F17", wasmFile, "0.03", "okb", "3000000");
             String initMsg = "{\"verifier\": \"0xbbE4733d85bc2b90682147779DA49caB38C0aA1F\", \"beneficiary\": \"0xbbE4733d85bc2b90682147779DA49caB38C0aA1F\"}";
-            String contractAddr = client.instantiate("8FF3CA2D9985C3A52B459E2F6E7822B23E1AF845961E22128D5F372FB9AA5F17", code, initMsg,"0.03","okb","3000000", Collections.emptyList());
+            String contractAddr = client.instantiate("8FF3CA2D9985C3A52B459E2F6E7822B23E1AF845961E22128D5F372FB9AA5F17", code, initMsg, "0.03", "okb", "3000000", Collections.emptyList());
             System.out.println(contractAddr);
         } catch (IOException e) {
             throw new RuntimeException(e);
