@@ -1,17 +1,17 @@
 package com.github.okayfine996.wasmify.toolWindow
 
-import com.github.okayfine996.wasmify.model.Network
 import com.github.okayfine996.wasmify.service.WasmService
+import com.github.okayfine996.wasmify.ui.contract.Network
 import com.github.okayfine996.wasmify.ui.network.AddNetworkDialog
-import com.github.okayfine996.wasmify.ui.signer.AddSignerDialog
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.ui.SimpleToolWindowPanel
-import com.intellij.ui.components.*
+import com.intellij.openapi.ui.VerticalFlowLayout
+import com.intellij.ui.components.IconLabelButton
+import com.intellij.ui.components.JBPanel
+import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.panels.HorizontalLayout
-import java.awt.Color
 import java.awt.Toolkit
-import javax.swing.JButton
 
 class WasmToolWindowNetworkPanel(vertical: Boolean, borderless: Boolean) : SimpleToolWindowPanel(vertical, borderless) {
     private val addNetwork = IconLabelButton(AllIcons.General.Add, {
@@ -24,11 +24,8 @@ class WasmToolWindowNetworkPanel(vertical: Boolean, borderless: Boolean) : Simpl
         dialog.show()
     })
 
-    private var jList = JBList<Network>().apply {
-        setCellRenderer { list, value, index, isSelected, cellHasFocus ->
-            com.github.okayfine996.wasmify.ui.contract.Network(value.name, value.chainId, value.restURL, value.explorerURL, value.denom).content.apply {}
-        }
-    }
+    var container = JBPanel<JBPanel<*>>(VerticalFlowLayout())
+
     private val wasmService = ApplicationManager.getApplication().getService(WasmService::class.java);
 
     init {
@@ -37,11 +34,32 @@ class WasmToolWindowNetworkPanel(vertical: Boolean, borderless: Boolean) : Simpl
             add(addNetwork)
         }
 
-        setContent(JBScrollPane(jList))
-        jList.setListData(wasmService.networkList.toTypedArray())
+        wasmService.networkList.stream().map { network ->
+            Network(network.name, network.chainId, network.restURL, network.explorerURL, network.denom).apply {
+                setOnRemoveNetworkListener { network ->
+                    wasmService.removeNetwork(network)
+                    container.remove(this.content)
+                    container.updateUI()
+                }
+            }
+        }.forEach {
+            container.add(it.content)
+        }
+        setContent(JBScrollPane(container))
     }
 
     fun updateJBList() {
-        jList.setListData(wasmService.networkList.toTypedArray())
+        container.removeAll()
+        wasmService.networkList.stream().map { network ->
+            Network(network.name, network.chainId, network.restURL, network.explorerURL, network.denom).apply {
+                setOnRemoveNetworkListener { network ->
+                    wasmService.removeNetwork(network)
+                    container.remove(this.content)
+                    container.updateUI()
+                }
+            }
+        }.forEach {
+            container.add(it.content)
+        }
     }
 }

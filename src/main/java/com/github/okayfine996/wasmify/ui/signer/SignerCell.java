@@ -6,7 +6,7 @@ import com.intellij.openapi.ui.LabeledComponent;
 import com.intellij.ui.components.IconLabelButton;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPasswordField;
-import com.intellij.ui.tabs.impl.JBTabsImpl;
+import icons.SdkIcons;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,6 +22,7 @@ public class SignerCell implements ClipboardOwner {
     private LabeledComponent<JBLabel> addressLabeledComponent;
     private IconLabelButton addressCopy;
     private IconLabelButton valueCopy;
+    private IconLabelButton deleteButton;
 
     public SignerCell(String name,String value) {
         this.name.setComponent(new JBLabel(name));
@@ -38,6 +39,12 @@ public class SignerCell implements ClipboardOwner {
     }
 
     private void createUIComponents() {
+
+        deleteButton = new IconLabelButton(SdkIcons.Sdk_Remove_icon, (jComponent)->{
+
+           return null;
+        });
+
         addressCopy = new IconLabelButton(AllIcons.Actions.Copy,jComponent -> {
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             StringSelection stringSelection = new StringSelection(addressLabeledComponent.getComponent().getText());

@@ -1,5 +1,6 @@
 package com.github.okayfine996.wasmify.service;
 
+import com.github.okayfine996.wasmify.cmwasm.results.MigrateResult;
 import com.github.okayfine996.wasmify.cmwasm.wasm.Fund;
 import com.github.okayfine996.wasmify.cmwasm.wasm.WasmClient;
 import com.github.okayfine996.wasmify.model.Network;
@@ -13,7 +14,7 @@ import java.util.stream.Collectors;
 
 import static com.intellij.openapi.components.StoragePathMacros.MODULE_FILE;
 
-@State(name = "wasmify",storages = {@Storage(roamingType = RoamingType.DISABLED,value = "wasmify.xml")})
+@State(name = "wasmify", storages = {@Storage(roamingType = RoamingType.DISABLED, value = "wasmify.xml")})
 @Service(Service.Level.PROJECT)
 public class WasmService implements PersistentStateComponent<WasmService.WasmState> {
     private WasmState wasmState = new WasmState();
@@ -22,7 +23,7 @@ public class WasmService implements PersistentStateComponent<WasmService.WasmSta
 
     }
 
-    public String deployWasmContract(String network, String wasmFile, String signerName, String initMsg,String fee, String gas, List<Fund> funds) {
+    public String deployWasmContract(String network, String wasmFile, String signerName, String initMsg, String fee, String gas, List<Fund> funds) {
         var net = wasmState.networkMap.get(network);
         if (net == null) {
             return null;
@@ -49,6 +50,26 @@ public class WasmService implements PersistentStateComponent<WasmService.WasmSta
         }
         WasmClient wasmClient = new WasmClient(net.getRestURL(), net.getChainId(), net.getTxMode());
         return wasmClient.executeWasmContract(signer.value, contractAddress, executeMsg, fee, net.getDenom(), gas, funds);
+    }
+
+    public MigrateResult updateWasmContract(String network, String contractAddress, String migrateFile, String signerName, String migrateMsg, String fee, String gas, int funds) {
+        var net = wasmState.networkMap.get(network);
+        if (net == null) {
+            return null;
+        }
+
+        Signer signer = wasmState.signerMap.get(signerName);
+        if (signer == null) {
+            return null;
+        }
+
+        List<Fund> fundList = new ArrayList<>();
+        if (funds > 0) {
+            fundList.add(new Fund(funds + "", net.getDenom()));
+        }
+
+        WasmClient wasmClient = new WasmClient(net.getRestURL(), net.getChainId(), net.getTxMode());
+        return wasmClient.upgradeContract(signer.value, contractAddress, migrateFile, migrateMsg, fee, net.getDenom(), gas, fundList);
     }
 
     public String queryWasmContract(String network, String contractAddress, String queryMsg) {
@@ -91,12 +112,24 @@ public class WasmService implements PersistentStateComponent<WasmService.WasmSta
         this.wasmState.signerMap.put(signer.name, signer);
     }
 
+    public void removeSigner(String signer) {
+        this.wasmState.signerMap.remove(signer);
+    }
+
     public void addNetwork(Network network) {
         this.wasmState.networkMap.put(network.getName(), network);
     }
 
+    public void removeNetwork(String network) {
+        this.wasmState.networkMap.remove(network);
+    }
+
     public void addContract(WasmContract contract) {
         this.wasmState.contractMap.put(contract.contractAddress, contract);
+    }
+
+    public void removeContract(String contractAddress) {
+        this.wasmState.contractMap.remove(contractAddress);
     }
 
 

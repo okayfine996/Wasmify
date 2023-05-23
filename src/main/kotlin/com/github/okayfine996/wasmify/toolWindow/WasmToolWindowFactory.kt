@@ -1,9 +1,9 @@
 package com.github.okayfine996.wasmify.toolWindow
 
+import com.github.okayfine996.wasmify.cmwasm.results.MigrateResult
 import com.github.okayfine996.wasmify.cmwasm.wasm.Fund
 import com.github.okayfine996.wasmify.service.WasmService
 import com.github.okayfine996.wasmify.ui.contract.WasmContract
-import com.intellij.icons.AllIcons
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
@@ -11,9 +11,7 @@ import com.intellij.openapi.ui.VerticalFlowLayout
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.components.JBScrollPane
-import com.intellij.ui.components.Label
 import com.intellij.ui.content.ContentFactory
-import javax.swing.JButton
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 
@@ -44,10 +42,9 @@ class WasmToolWindowFactory : ToolWindowFactory {
                         return wasmService.queryWasmContract(chain, contractAddress, queryMsg)
                     }
 
-                    override fun migrate(signer: String?, contractAddress: String?, migrateMsg: String?, chain: String?, wasmFile: String?, fee: String?, gas: String?, funds: MutableList<Fund>?): String {
-                        TODO("Not yet implemented")
+                    override fun migrate(signer: String?, contractAddress: String?, migrateMsg: String?, chain: String?, wasmFile: String?, fee: String?, gas: String?, fund: Int): MigrateResult? {
+                        return wasmService.updateWasmContract(chain, contractAddress, wasmFile, signer, migrateMsg, fee, gas, fund)
                     }
-
                 })
             })
         }

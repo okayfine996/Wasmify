@@ -30,16 +30,6 @@ class WasmToolWindowSignerPanel : SimpleToolWindowPanel(true) {
         dialog.show()
     })
 
-//        addActionListener {
-//            val dialog = AddSignerDialog()
-//            val dimension = Toolkit.getDefaultToolkit().screenSize
-//            val width = 600
-//            val height = 300
-//            dialog.setBounds((dimension.width - width) / 2, (dimension.height - height) / 2, width, height)
-//            dialog.pack()
-//            dialog.show()
-//        }
-//        );
 
     var container = JBPanel<JBPanel<*>>(VerticalFlowLayout())
 
