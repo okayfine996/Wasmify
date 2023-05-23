@@ -24,7 +24,9 @@ public class SignerCell implements ClipboardOwner {
     private IconLabelButton valueCopy;
     private IconLabelButton deleteButton;
 
-    public SignerCell(String name,String value) {
+    private OnRemoveListener onRemoveListener;
+
+    public SignerCell(String name, String value) {
         this.name.setComponent(new JBLabel(name));
         JBPasswordField jbPasswordField = new JBPasswordField();
         jbPasswordField.setText(value);
@@ -40,15 +42,17 @@ public class SignerCell implements ClipboardOwner {
 
     private void createUIComponents() {
 
-        deleteButton = new IconLabelButton(SdkIcons.Sdk_Remove_icon, (jComponent)->{
-
-           return null;
+        deleteButton = new IconLabelButton(SdkIcons.Sdk_Remove_icon, (jComponent) -> {
+            if (onRemoveListener != null) {
+                onRemoveListener.onRemove(this.name.getText());
+            }
+            return null;
         });
 
-        addressCopy = new IconLabelButton(AllIcons.Actions.Copy,jComponent -> {
+        addressCopy = new IconLabelButton(AllIcons.Actions.Copy, jComponent -> {
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             StringSelection stringSelection = new StringSelection(addressLabeledComponent.getComponent().getText());
-            clipboard.setContents(stringSelection,SignerCell.this);
+            clipboard.setContents(stringSelection, SignerCell.this);
             return null;
         });
 
@@ -56,13 +60,23 @@ public class SignerCell implements ClipboardOwner {
         valueCopy = new IconLabelButton(AllIcons.Actions.Copy, jComponent -> {
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             StringSelection stringSelection = new StringSelection(addressLabeledComponent.getComponent().getText());
-            clipboard.setContents(stringSelection,SignerCell.this);
+            clipboard.setContents(stringSelection, SignerCell.this);
             return null;
         });
+    }
+
+
+    public void setOnRemoveListener(OnRemoveListener onRemoveListener) {
+        this.onRemoveListener = onRemoveListener;
     }
 
     @Override
     public void lostOwnership(Clipboard clipboard, Transferable contents) {
 
+    }
+
+
+    public interface OnRemoveListener {
+        void onRemove(String name);
     }
 }

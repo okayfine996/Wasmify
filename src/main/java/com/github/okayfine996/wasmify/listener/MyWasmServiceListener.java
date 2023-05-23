@@ -17,25 +17,25 @@ public class MyWasmServiceListener implements WasmServiceListener {
     public void deployWasmEvent(String signer, String contractAddress, String chainName) {
         WasmContract wasmContract = new WasmContract(contractAddress, chainName, signer);
         wasmService.addContract(new WasmService.WasmContract(contractAddress, chainName, signer));
-        wasmContract.setWasmContractActionListener(new WasmContract.WasmContractActionListener() {
+        WasmToolWindowFactory.Companion.getContractPanel().updatePanel();
+//        wasmContract.setWasmContractActionListener(new WasmContract.WasmContractActionListener() {
+//
+//            @Override
+//            public String execute(String signer, String contractAddress, String executeMsg, String chain, String fee, String gas, List<Fund> funds) {
+//                return wasmService.executeWasmContract(chain, contractAddress, signer, executeMsg, fee, gas, funds);
+//            }
+//
+//            @Override
+//            public String query(String contractAddress, String queryMsg, String chain) {
+//                return wasmService.queryWasmContract(chain, contractAddress, queryMsg);
+//            }
+//
+//            @Override
+//            public MigrateResult migrate(String signer, String contractAddress, String migrateMsg, String chain, String wasmFile, String fee, String gas, int fund) {
+//                return wasmService.updateWasmContract(chain, contractAddress, wasmFile, signer, migrateMsg, fee, gas, fund);
+//            }
+//        });
 
-            @Override
-            public String execute(String signer, String contractAddress, String executeMsg, String chain, String fee, String gas, List<Fund> funds) {
-                return wasmService.executeWasmContract(chain, contractAddress, signer, executeMsg, fee, gas, funds);
-            }
-
-            @Override
-            public String query(String contractAddress, String queryMsg, String chain) {
-                return wasmService.queryWasmContract(chain, contractAddress, queryMsg);
-            }
-
-            @Override
-            public MigrateResult migrate(String signer, String contractAddress, String migrateMsg, String chain, String wasmFile, String fee, String gas, int fund) {
-                return wasmService.updateWasmContract(chain, contractAddress, wasmFile, signer, migrateMsg, fee, gas, fund);
-            }
-        });
-
-        WasmToolWindowFactory.map.addContract(wasmContract);
         Notifier.notifyInfo(null, "Deploy Success " + contractAddress);
     }
 }

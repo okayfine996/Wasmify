@@ -43,12 +43,28 @@ class WasmToolWindowSignerPanel : SimpleToolWindowPanel(true) {
 
 
 
-        wasmService.signerList.stream().map { SignerCell(it.name, it.value) }.forEach { container.add(it.content) }
+        wasmService.signerList.stream().map {
+            SignerCell(it.name, it.value).apply {
+                setOnRemoveListener { name ->
+                    wasmService.removeSigner(name)
+                    container.remove(this.content)
+                    container.updateUI()
+                }
+            }
+        }.forEach { container.add(it.content) }
         setContent(JBScrollPane(container))
     }
 
     fun updateList() {
         container.removeAll()
-        wasmService.signerList.stream().map { SignerCell(it.name, it.value) }.forEach { container.add(it.content) }
+        wasmService.signerList.stream().map {
+            SignerCell(it.name, it.value).apply {
+                setOnRemoveListener { name ->
+                    wasmService.removeSigner(name)
+                    container.remove(this.content)
+                    container.updateUI()
+                }
+            }
+        }.forEach { container.add(it.content) }
     }
 }

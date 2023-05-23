@@ -26,6 +26,7 @@ import icons.SdkIcons;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -53,6 +54,8 @@ public class WasmContract {
 
     private WasmContractActionListener wasmContractActionListener;
 
+    private OnRemoveListener onRemoveListener;
+
     public WasmContract(String contractAddress, String chainName, String signer) {
         this.contractAddress = contractAddress;
         this.chainNameStr = chainName;
@@ -70,7 +73,9 @@ public class WasmContract {
 
 
         deleteButton = new IconLabelButton(SdkIcons.Sdk_Remove_icon, (jComponent) -> {
-            System.out.println();
+            if (onRemoveListener != null) {
+                onRemoveListener.onRemove(this.contractAddress);
+            }
             return null;
         });
 
@@ -84,12 +89,17 @@ public class WasmContract {
         excuteMsgTextField = new ExpandableTextField();
 
         gasLimitLabel = new LabeledComponent<JBIntSpinner>();
-        gasLimitLabel.setComponent(new JBIntSpinner(3000000, 21000, 100000000, 1000));
+        JBIntSpinner  gasSpinner = new JBIntSpinner(3000000, 21000, 100000000, 1000);
+        gasSpinner.setMinimumSize(new Dimension(100,30));
+        gasSpinner.setPreferredSize(new Dimension(100,30));
+        gasLimitLabel.setComponent(gasSpinner);
         feeLabel = new LabeledComponent<>();
         feeLabel.setComponent(new JBTextField("0.03"));
         fundsLabel = new LabeledComponent<>();
-        fundsLabel.setComponent(new JBIntSpinner(0, 0, Integer.MAX_VALUE, 1));
-
+        JBIntSpinner fundSpinner = new JBIntSpinner(0, 0, Integer.MAX_VALUE, 1);
+        fundSpinner.setMinimumSize(new Dimension(100,30));
+        fundSpinner.setPreferredSize(new Dimension(100,30));
+        fundsLabel.setComponent(fundSpinner);
         migrateLabel = new LabeledComponent<TextFieldWithBrowseButton>();
         TextFieldWithBrowseButton wasmFileBrowseButton = new TextFieldWithBrowseButton();
         wasmFileBrowseButton.addBrowseFolderListener(new TextBrowseFolderListener(new FileChooserDescriptor(true, false, false, false, false, false)));
@@ -172,6 +182,9 @@ public class WasmContract {
         }
     }
 
+    public void setOnRemoveListener(OnRemoveListener onRemoveListener) {
+        this.onRemoveListener = onRemoveListener;
+    }
 
     public interface WasmContractActionListener {
         String execute(String signer, String contractAddress, String executeMsg, String chain, String fee, String gas, List<Fund> funds);
@@ -179,5 +192,10 @@ public class WasmContract {
         String query(String contractAddress, String queryMsg, String chain);
 
         MigrateResult migrate(String signer, String contractAddress, String migrateMsg, String chain, String wasmFile, String fee, String gas, int fund);
+    }
+
+
+    public interface OnRemoveListener {
+        void onRemove(String contractAddress);
     }
 }

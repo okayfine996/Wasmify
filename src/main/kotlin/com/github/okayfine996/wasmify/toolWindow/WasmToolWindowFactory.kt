@@ -25,34 +25,8 @@ class WasmToolWindowFactory : ToolWindowFactory {
 
 
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
-        val wasmToolWindow = WasmToolWindow(toolWindow)
-        map = wasmToolWindow
-
-        val wasmService = ApplicationManager.getApplication().getService(WasmService::class.java)
-
-        val content = contentFactory.createContent(wasmToolWindow.getContent(), "Contract", false)
-        wasmService.contractList.forEach {
-            wasmToolWindow.addContract(WasmContract(it.contractAddress, it.chainName, it.signer).apply {
-                setWasmContractActionListener(object : WasmContract.WasmContractActionListener {
-                    override fun execute(signer: String?, contractAddress: String?, executeMsg: String?, chain: String?, fee: String?, gas: String?, funds: MutableList<Fund>?): String {
-                        return wasmService.executeWasmContract(chain, contractAddress, signer, executeMsg, fee, gas, funds)
-                    }
-
-                    override fun query(contractAddress: String?, queryMsg: String?, chain: String?): String {
-                        return wasmService.queryWasmContract(chain, contractAddress, queryMsg)
-                    }
-
-                    override fun migrate(signer: String?, contractAddress: String?, migrateMsg: String?, chain: String?, wasmFile: String?, fee: String?, gas: String?, fund: Int): MigrateResult? {
-                        return wasmService.updateWasmContract(chain, contractAddress, wasmFile, signer, migrateMsg, fee, gas, fund)
-                    }
-                })
-            })
-        }
-
-        toolWindow.contentManager.addContent(content)
-
+        toolWindow.contentManager.addContent(contentFactory.createContent(contractPanel,"Contract", false))
         toolWindow.contentManager.addContent(contentFactory.createContent(networkPanel, "Network", false))
-
         toolWindow.contentManager.addContent(contentFactory.createContent(signerPanel, "Signer", false))
     }
 
@@ -60,34 +34,12 @@ class WasmToolWindowFactory : ToolWindowFactory {
 
 
     companion object {
-        lateinit var map: WasmToolWindow
         var signerPanel = WasmToolWindowSignerPanel()
         var networkPanel = WasmToolWindowNetworkPanel(true, true)
+        var contractPanel = WasmToolWindowContractPanel()
     }
 
-    fun getWasmToolWindow(): WasmToolWindow {
-        return map
-    }
-}
 
-class WasmToolWindow(toolWindow: ToolWindow) {
-    private val container = JPanel()
-    private val map = HashMap<String, WasmContract>()
-
-    init {
-        container.apply {
-            layout = VerticalFlowLayout()
-        }
-    }
-
-    fun getContent(): JScrollPane {
-        return JBScrollPane(container)
-    }
-
-    fun addContract(contract: WasmContract) {
-        map.put(contract.contractAddress, contract)
-        container.add(contract.rootPanel)
-    }
 }
 
 
