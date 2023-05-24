@@ -1,10 +1,12 @@
 package com.github.okayfine996.wasmify.ui.contract;
 
+import com.alibaba.fastjson.JSON;
 import com.github.okayfine996.wasmify.cmwasm.results.MigrateResult;
 import com.github.okayfine996.wasmify.cmwasm.wasm.Fund;
 import com.github.okayfine996.wasmify.cmwasm.wasm.msg.MigrateMsg;
 import com.github.okayfine996.wasmify.notify.Notifier;
 import com.github.okayfine996.wasmify.service.WasmService;
+import com.github.okayfine996.wasmify.service.Signer;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
@@ -13,10 +15,9 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
-import com.intellij.openapi.ui.ComboBox;
-import com.intellij.openapi.ui.LabeledComponent;
-import com.intellij.openapi.ui.TextBrowseFolderListener;
-import com.intellij.openapi.ui.TextFieldWithBrowseButton;
+import com.intellij.openapi.ui.*;
+import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.JBIntSpinner;
 import com.intellij.ui.components.IconLabelButton;
 import com.intellij.ui.components.JBLabel;
@@ -26,6 +27,7 @@ import icons.SdkIcons;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -56,10 +58,19 @@ public class WasmContract {
 
     private OnRemoveListener onRemoveListener;
 
-    public WasmContract(String contractAddress, String chainName, String signer) {
+    private Project project;
+    private WasmService wasmService;
+
+    public WasmContract(Project project, String contractAddress, String chainName, String signer) {
+        this.project = project;
         this.contractAddress = contractAddress;
         this.chainNameStr = chainName;
         this.signer = signer;
+
+        this.wasmService = project.getService(WasmService.class);
+        initView();
+        initEvent();
+        initValidator();
     }
 
     public JPanel getRootPanel() {
@@ -67,9 +78,42 @@ public class WasmContract {
     }
 
     private void createUIComponents() {
-        var wasmService = ApplicationManager.getApplication().getService(WasmService.class);
+
         chainName = new LabeledComponent<>();
         chainName.setComponent(new JBLabel(this.chainNameStr));
+
+        contractLabeledComponent = new LabeledComponent<>();
+        contractLabeledComponent.setComponent(new JBLabel(contractAddress));
+
+        signerLabel = new LabeledComponent<>();
+
+
+        excuteMsgTextField = new ExpandableTextField();
+
+        gasLimitLabel = new LabeledComponent<JBIntSpinner>();
+        JBIntSpinner gasSpinner = new JBIntSpinner(3000000, 21000, 100000000, 1000);
+        gasSpinner.setMinimumSize(new Dimension(100, 30));
+        gasSpinner.setPreferredSize(new Dimension(100, 30));
+        gasLimitLabel.setComponent(gasSpinner);
+
+        feeLabel = new LabeledComponent<>();
+        feeLabel.setComponent(new JBTextField("0.03"));
+
+        fundsLabel = new LabeledComponent<>();
+        JBIntSpinner fundSpinner = new JBIntSpinner(0, 0, Integer.MAX_VALUE, 1);
+        fundSpinner.setMinimumSize(new Dimension(100, 30));
+        fundSpinner.setPreferredSize(new Dimension(100, 30));
+        fundsLabel.setComponent(fundSpinner);
+
+        migrateLabel = new LabeledComponent<TextFieldWithBrowseButton>();
+        TextFieldWithBrowseButton wasmFileBrowseButton = new TextFieldWithBrowseButton();
+        wasmFileBrowseButton.addBrowseFolderListener(new TextBrowseFolderListener(new FileChooserDescriptor(true, false, false, false, false, false)));
+        wasmFileBrowseButton.setEditable(true);
+        migrateLabel.setComponent(wasmFileBrowseButton);
+
+        executeButton = new JButton("EXECUTE");
+        queryButton = new JButton("QUERY");
+        migrateButton = new JButton("Migrate");
 
 
         deleteButton = new IconLabelButton(SdkIcons.Sdk_Remove_icon, (jComponent) -> {
@@ -79,40 +123,26 @@ public class WasmContract {
             return null;
         });
 
-        contractLabeledComponent = new LabeledComponent<>();
-        contractLabeledComponent.setComponent(new JBLabel(contractAddress));
-        signerLabel = new LabeledComponent<>();
-        String[] signerArray = wasmService.getSignerList().stream().map(WasmService.Signer::getName).toArray(String[]::new);
+    }
+
+    public String getContractAddress() {
+        return contractAddress;
+    }
+
+
+    private void initView() {
+        String[] signerArray = wasmService.getSignerList().stream().map(Signer::getName).toArray(String[]::new);
         ComboBox<String> signerCombox = new ComboBox<>(signerArray);
         signerLabel.setComponent(signerCombox);
+    }
 
-        excuteMsgTextField = new ExpandableTextField();
+    private void initEvent() {
 
-        gasLimitLabel = new LabeledComponent<JBIntSpinner>();
-        JBIntSpinner  gasSpinner = new JBIntSpinner(3000000, 21000, 100000000, 1000);
-        gasSpinner.setMinimumSize(new Dimension(100,30));
-        gasSpinner.setPreferredSize(new Dimension(100,30));
-        gasLimitLabel.setComponent(gasSpinner);
-        feeLabel = new LabeledComponent<>();
-        feeLabel.setComponent(new JBTextField("0.03"));
-        fundsLabel = new LabeledComponent<>();
-        JBIntSpinner fundSpinner = new JBIntSpinner(0, 0, Integer.MAX_VALUE, 1);
-        fundSpinner.setMinimumSize(new Dimension(100,30));
-        fundSpinner.setPreferredSize(new Dimension(100,30));
-        fundsLabel.setComponent(fundSpinner);
-        migrateLabel = new LabeledComponent<TextFieldWithBrowseButton>();
-        TextFieldWithBrowseButton wasmFileBrowseButton = new TextFieldWithBrowseButton();
-        wasmFileBrowseButton.addBrowseFolderListener(new TextBrowseFolderListener(new FileChooserDescriptor(true, false, false, false, false, false)));
-        wasmFileBrowseButton.setEditable(true);
-        migrateLabel.setComponent(wasmFileBrowseButton);
-
-        executeButton = new JButton("EXECUTE");
         executeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (wasmContractActionListener != null) {
                     ProgressManager progressManager = ProgressManager.getInstance();
-                    Project project = ProjectManager.getInstance().getDefaultProject();
                     progressManager.run(new Task.Backgroundable(project, "execute wasm") {
                         @Override
                         public void run(@NotNull ProgressIndicator indicator) {
@@ -126,13 +156,11 @@ public class WasmContract {
             }
         });
 
-        queryButton = new JButton("QUERY");
         queryButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (wasmContractActionListener != null) {
                     ProgressManager progressManager = ProgressManager.getInstance();
-                    Project project = ProjectManager.getInstance().getDefaultProject();
                     progressManager.run(new Task.Backgroundable(project, "query wasm") {
                         @Override
                         public void run(@NotNull ProgressIndicator indicator) {
@@ -144,13 +172,11 @@ public class WasmContract {
             }
         });
 
-        migrateButton = new JButton("Migrate");
         migrateButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (wasmContractActionListener != null) {
                     ProgressManager progressManager = ProgressManager.getInstance();
-                    Project project = ProjectManager.getInstance().getDefaultProject();
                     progressManager.run(new Task.Backgroundable(project, "migrate contract") {
                         @Override
                         public void run(@NotNull ProgressIndicator indicator) {
@@ -159,7 +185,7 @@ public class WasmContract {
                             String feeAmout = feeLabel.getComponent().getText();
                             String gas = gasLimitLabel.getComponent().getNumber() + "";
                             int fund = fundsLabel.getComponent().getNumber();
-                            MigrateResult result = wasmContractActionListener.migrate(signer, contractAddress, migrateMsg, chainNameStr,migrateFile, feeAmout, gas, fund);
+                            MigrateResult result = wasmContractActionListener.migrate(signer, contractAddress, migrateMsg, chainNameStr, migrateFile, feeAmout, gas, fund);
                             if (result == null || !result.isSuccess()) {
                                 Notifier.notifyError(null, "Migrate failed");
                             } else {
@@ -172,8 +198,25 @@ public class WasmContract {
         });
     }
 
-    public String getContractAddress() {
-        return contractAddress;
+    private void initValidator() {
+        new ComponentValidator(ProjectManager.getInstance().getDefaultProject()).withValidator(v -> {
+            String str = excuteMsgTextField.getText();
+            if (StringUtil.isNotEmpty(str)) {
+                if (!JSON.isValidObject(str)) {
+                    v.updateInfo(new ValidationInfo("invalid json", excuteMsgTextField));
+                }else {
+                    v.updateInfo(null);
+                }
+            } else {
+                v.updateInfo(null);
+            }
+        }).installOn(excuteMsgTextField);
+        excuteMsgTextField.getDocument().addDocumentListener(new DocumentAdapter() {
+            @Override
+            protected void textChanged(@NotNull DocumentEvent e) {
+                ComponentValidator.getInstance(excuteMsgTextField).ifPresent(v -> v.revalidate());
+            }
+        });
     }
 
     public void setWasmContractActionListener(WasmContractActionListener actionListener) {

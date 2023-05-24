@@ -1,41 +1,21 @@
 package com.github.okayfine996.wasmify.listener;
 
-import com.github.okayfine996.wasmify.cmwasm.results.MigrateResult;
-import com.github.okayfine996.wasmify.cmwasm.wasm.Fund;
 import com.github.okayfine996.wasmify.notify.Notifier;
+import com.github.okayfine996.wasmify.service.WasmContract;
 import com.github.okayfine996.wasmify.service.WasmService;
 import com.github.okayfine996.wasmify.toolWindow.WasmToolWindowFactory;
-import com.github.okayfine996.wasmify.ui.contract.WasmContract;
+import com.github.okayfine996.wasmify.utils.ToolWindowUtil;
 import com.intellij.openapi.application.ApplicationManager;
-
-import java.util.List;
+import com.intellij.openapi.project.Project;
 
 public class MyWasmServiceListener implements WasmServiceListener {
     private WasmService wasmService = ApplicationManager.getApplication().getService(WasmService.class);
 
     @Override
-    public void deployWasmEvent(String signer, String contractAddress, String chainName) {
-        WasmContract wasmContract = new WasmContract(contractAddress, chainName, signer);
-        wasmService.addContract(new WasmService.WasmContract(contractAddress, chainName, signer));
-        WasmToolWindowFactory.Companion.getContractPanel().updatePanel();
-//        wasmContract.setWasmContractActionListener(new WasmContract.WasmContractActionListener() {
-//
-//            @Override
-//            public String execute(String signer, String contractAddress, String executeMsg, String chain, String fee, String gas, List<Fund> funds) {
-//                return wasmService.executeWasmContract(chain, contractAddress, signer, executeMsg, fee, gas, funds);
-//            }
-//
-//            @Override
-//            public String query(String contractAddress, String queryMsg, String chain) {
-//                return wasmService.queryWasmContract(chain, contractAddress, queryMsg);
-//            }
-//
-//            @Override
-//            public MigrateResult migrate(String signer, String contractAddress, String migrateMsg, String chain, String wasmFile, String fee, String gas, int fund) {
-//                return wasmService.updateWasmContract(chain, contractAddress, wasmFile, signer, migrateMsg, fee, gas, fund);
-//            }
-//        });
-
+    public void deployWasmEvent(Project project, String signer, String contractAddress, String chainName) {
+        WasmService wasmService = project.getService(WasmService.class);
+        wasmService.addContract(new WasmContract(contractAddress, chainName, signer));
+        ToolWindowUtil.getContractPanel(project).updatePanel();
         Notifier.notifyInfo(null, "Deploy Success " + contractAddress);
     }
 }

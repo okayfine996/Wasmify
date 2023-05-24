@@ -17,7 +17,7 @@ import java.awt.datatransfer.Transferable;
 
 public class SignerCell implements ClipboardOwner {
     private LabeledComponent name;
-    private LabeledComponent value;
+    private LabeledComponent<JBPasswordField> value;
     private JPanel rootPanel;
     private LabeledComponent<JBLabel> addressLabeledComponent;
     private IconLabelButton addressCopy;
@@ -59,7 +59,7 @@ public class SignerCell implements ClipboardOwner {
 
         valueCopy = new IconLabelButton(AllIcons.Actions.Copy, jComponent -> {
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-            StringSelection stringSelection = new StringSelection(addressLabeledComponent.getComponent().getText());
+            StringSelection stringSelection = new StringSelection(value.getComponent().getText());
             clipboard.setContents(stringSelection, SignerCell.this);
             return null;
         });

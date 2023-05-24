@@ -1,8 +1,10 @@
 package com.github.okayfine996.wasmify.cmwasm.utils.crypto;
 
+import com.google.common.base.Splitter;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Utils;
+import org.bitcoinj.crypto.*;
 import org.bouncycastle.util.encoders.DecoderException;
 import org.bouncycastle.util.encoders.Hex;
 
@@ -11,8 +13,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.List;
 
 public class Crypto {
+    private static String hdPath = "M/44H/60H/0H/0/0";
 
     public static byte[] sign(byte[] msg, String privateKey) throws NoSuchAlgorithmException {
         ECKey k = ECKey.fromPrivate(new BigInteger(privateKey, 16));
@@ -44,8 +48,6 @@ public class Crypto {
         ECKey k = ECKey.fromPrivate(new BigInteger(privateKey, 16));
         return k.getPublicKeyAsHex();
     }
-
-
 
 
     public static boolean validateSig(byte[] msg, byte[] pubKey, byte[] sig) throws NoSuchAlgorithmException {
@@ -83,6 +85,18 @@ public class Crypto {
             e.printStackTrace();
             return "";
         }
+    }
+
+    public static String privateKeyFromMnemonic(String mnemonic) {
+        List<String> words = Splitter.on(" ").splitToList(mnemonic);
+        byte[] seed = MnemonicCode.INSTANCE.toSeed(words, "");
+        DeterministicKey key = HDKeyDerivation.createMasterPrivateKey(seed);
+
+        List<ChildNumber> childNumbers = HDUtils.parsePath(hdPath);
+        for (ChildNumber cn : childNumbers) {
+            key = HDKeyDerivation.deriveChildKey(key, cn);
+        }
+        return key.getPrivateKeyAsHex();
     }
 
     public static boolean validPubKey(String pubKey) {

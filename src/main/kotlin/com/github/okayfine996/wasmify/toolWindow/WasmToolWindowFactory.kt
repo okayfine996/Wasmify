@@ -25,21 +25,18 @@ class WasmToolWindowFactory : ToolWindowFactory {
 
 
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
-        toolWindow.contentManager.addContent(contentFactory.createContent(contractPanel,"Contract", false))
-        toolWindow.contentManager.addContent(contentFactory.createContent(networkPanel, "Network", false))
-        toolWindow.contentManager.addContent(contentFactory.createContent(signerPanel, "Signer", false))
+
+        toolWindow.contentManager.addContent(contentFactory.createContent(WasmToolWindowContractPanel(project),"Contract", false))
+        toolWindow.contentManager.addContent(contentFactory.createContent(WasmToolWindowNetworkPanel(project), "Network", false))
+        toolWindow.contentManager.addContent(contentFactory.createContent(WasmToolWindowSignerPanel(project), "Signer", false))
     }
 
     override fun shouldBeAvailable(project: Project) = true
 
 
-    companion object {
-        var signerPanel = WasmToolWindowSignerPanel()
-        var networkPanel = WasmToolWindowNetworkPanel(true, true)
-        var contractPanel = WasmToolWindowContractPanel()
+    override fun init(toolWindow: ToolWindow) {
+        super.init(toolWindow)
     }
-
-
 }
 
 

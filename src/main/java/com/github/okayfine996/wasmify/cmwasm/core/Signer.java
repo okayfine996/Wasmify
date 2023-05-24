@@ -11,7 +11,8 @@ import com.github.okayfine996.wasmify.cmwasm.wasm.msg.BaseMsg;
 import groovy.util.logging.Slf4j;
 import org.bouncycastle.util.Strings;
 import org.bouncycastle.util.encoders.Base64;
-import org.bouncycastle.util.encoders.Hex;import org.web3j.crypto.ECKeyPair;
+import org.bouncycastle.util.encoders.Hex;
+import org.web3j.crypto.ECKeyPair;
 import org.web3j.crypto.Sign;
 
 import java.math.BigInteger;
@@ -19,6 +20,8 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 @Slf4j
@@ -30,6 +33,12 @@ public class Signer {
 
 
     public Signer(String privateKey) {
+        String pattern = "[a-fA-F0-9]{64}";
+        Pattern p = Pattern.compile(pattern);
+        Matcher m = p.matcher(privateKey);
+        if (!m.find()) {
+            privateKey = Crypto.privateKeyFromMnemonic(privateKey);
+        }
         this.privateKey = new PrivateKey(privateKey);
     }
 
@@ -49,7 +58,7 @@ public class Signer {
         this.accountNum = accountNum;
     }
 
-    private StdTx buildUnsignedTx(BaseMsg msg, String feeAmount, String gas, String memo, String nonce,String denom) {
+    private StdTx buildUnsignedTx(BaseMsg msg, String feeAmount, String gas, String memo, String nonce, String denom) {
         Fee fee = new Fee();
         List<Token> amountList = new ArrayList<>();
         Token token = new Token(Utils.NewDecString(feeAmount), denom);
@@ -67,7 +76,7 @@ public class Signer {
     }
 
 
-    public StdTx buildAndSignStdTx(BaseMsg msg, String feeAmount, String gas, String memo, String nonce,String denom) throws JsonProcessingException {
+    public StdTx buildAndSignStdTx(BaseMsg msg, String feeAmount, String gas, String memo, String nonce, String denom) throws JsonProcessingException {
         StdTx stdTx = buildUnsignedTx(msg, feeAmount, gas, memo, nonce, denom);
         Signature signature = signTx(stdTx, nonce);
         stdTx.setSignatures(Arrays.asList(signature));

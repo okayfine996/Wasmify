@@ -8,6 +8,7 @@ import com.github.okayfine996.wasmify.ui.contract.WasmContract
 import com.github.okayfine996.wasmify.ui.network.AddNetworkDialog
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.openapi.ui.VerticalFlowLayout
 import com.intellij.ui.components.IconLabelButton
@@ -21,14 +22,16 @@ import java.awt.Toolkit
  *@author finefine at: 2023/5/23 18:20
  *
  */
-class WasmToolWindowContractPanel : SimpleToolWindowPanel(true) {
+class WasmToolWindowContractPanel(project: Project) : SimpleToolWindowPanel(true) {
+    val project: Project
     val container = JBPanel<JBPanel<*>>(VerticalFlowLayout())
 
-    private val wasmService = ApplicationManager.getApplication().getService(WasmService::class.java);
+    private val wasmService = project.getService(WasmService::class.java);
 
     init {
+        this.project = project
         wasmService.contractList.map {
-            WasmContract(it.contractAddress, it.chainName, it.signer)
+            WasmContract(project, it.contractAddress, it.chainName, it.signer)
         }.forEach { it ->
             initEvent(it)
             container.add(it.rootPanel)
@@ -40,7 +43,7 @@ class WasmToolWindowContractPanel : SimpleToolWindowPanel(true) {
     fun updatePanel() {
         container.removeAll()
         wasmService.contractList.map {
-            WasmContract(it.contractAddress, it.chainName, it.signer)
+            WasmContract(project, it.contractAddress, it.chainName, it.signer)
         }.forEach { it ->
             initEvent(it)
             container.add(it.rootPanel)

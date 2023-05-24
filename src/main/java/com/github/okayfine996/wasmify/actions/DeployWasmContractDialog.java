@@ -1,22 +1,26 @@
 package com.github.okayfine996.wasmify.actions;
 
+import com.alibaba.fastjson.JSON;
+import com.github.okayfine996.wasmify.service.Signer;
 import com.github.okayfine996.wasmify.service.WasmService;
 import com.github.okayfine996.wasmify.tasks.DeployWasmContractTask;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.ComboBox;
-import com.intellij.openapi.ui.LabeledComponent;
-import com.intellij.openapi.ui.TextBrowseFolderListener;
-import com.intellij.openapi.ui.TextFieldWithBrowseButton;
+import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.ui.*;
+import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.JBIntSpinner;
 import com.intellij.ui.JBSplitter;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.ui.components.fields.ExpandableTextField;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
 import java.awt.event.*;
 import java.util.Collections;
 
@@ -34,6 +38,8 @@ public class DeployWasmContractDialog extends JDialog {
 
     private TextFieldWithBrowseButton wasmFileBrowseButton;
 
+    private ExpandableTextField initMsgTextField;
+
     private Project project;
     private String wasmFilePath;
 
@@ -42,6 +48,10 @@ public class DeployWasmContractDialog extends JDialog {
         this.project = project;
         this.wasmFilePath = wasmFilePath;
         this.wasmFileBrowseButton.setText(wasmFilePath);
+
+
+
+        initView();
 
         setContentPane(contentPane);
         setModal(true);
@@ -73,6 +83,8 @@ public class DeployWasmContractDialog extends JDialog {
                 onCancel();
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+
+        initValidator();
     }
 
     private void onOK() {
@@ -94,32 +106,21 @@ public class DeployWasmContractDialog extends JDialog {
     }
 
     private void createUIComponents() {
-
-        WasmService wasmService = ApplicationManager.getApplication().getService(WasmService.class);
-
         Network = new LabeledComponent<>();
-        String[] comboxItems = wasmService.getNetworkList().stream().map(com.github.okayfine996.wasmify.model.Network::getName).toArray(String[]::new);
-        ComboBox<String> networkCombox = new ComboBox<>(comboxItems);
 
-        Network.setComponent(networkCombox);
 
         wasmFile = new LabeledComponent<>();
         wasmFileBrowseButton = new TextFieldWithBrowseButton();
         wasmFileBrowseButton.addBrowseFolderListener(new TextBrowseFolderListener(new FileChooserDescriptor(true, false, false, false, false, false)));
         wasmFileBrowseButton.setEditable(true);
-        wasmFileBrowseButton.setText(this.wasmFilePath);
-
         wasmFile.setComponent(wasmFileBrowseButton);
 
         initMsg = new LabeledComponent<>();
-        ExpandableTextField initMsgTextField = new ExpandableTextField();
+        initMsgTextField = new ExpandableTextField();
         initMsgTextField.setEnabled(true);
         initMsg.setComponent(initMsgTextField);
 
         signer = new LabeledComponent<>();
-        String[] signerArray = wasmService.getSignerList().stream().map(WasmService.Signer::getName).toArray(String[]::new);
-        ComboBox<String> signerCombox = new ComboBox<>(signerArray);
-        signer.setComponent(signerCombox);
 
 
         feeLabel = new LabeledComponent();
@@ -129,5 +130,42 @@ public class DeployWasmContractDialog extends JDialog {
         gasLabel.setComponent(new JBIntSpinner(200000, 21000,1000000000,10000));
         denomLabel = new JBLabel("OKB");
 
+    }
+
+    private void initView() {
+        WasmService wasmService = project.getService(WasmService.class);
+
+        String[] comboxItems = wasmService.getNetworkList().stream().map(com.github.okayfine996.wasmify.model.Network::getName).toArray(String[]::new);
+        ComboBox<String> networkCombox = new ComboBox<>(comboxItems);
+        Network.setComponent(networkCombox);
+
+        wasmFileBrowseButton.setText(this.wasmFilePath);
+
+        // signer
+        String[] signerArray = wasmService.getSignerList().stream().map(Signer::getName).toArray(String[]::new);
+        ComboBox<String> signerCombox = new ComboBox<>(signerArray);
+        signer.setComponent(signerCombox);
+
+    }
+
+    private void initValidator() {
+        new ComponentValidator(ProjectManager.getInstance().getDefaultProject()).withValidator(v -> {
+            String str = initMsgTextField.getText();
+            if (StringUtil.isNotEmpty(str)) {
+                if (!JSON.isValidObject(str)) {
+                    v.updateInfo(new ValidationInfo("invalid json", initMsgTextField));
+                }else {
+                    v.updateInfo(null);
+                }
+            } else {
+                v.updateInfo(null);
+            }
+        }).installOn(initMsgTextField);
+        initMsgTextField.getDocument().addDocumentListener(new DocumentAdapter() {
+            @Override
+            protected void textChanged(@NotNull DocumentEvent e) {
+                ComponentValidator.getInstance(initMsgTextField).ifPresent(v -> v.revalidate());
+            }
+        });
     }
 }

@@ -42,13 +42,13 @@ public class DeployWasmContractTask extends Task.Backgroundable {
 
     @Override
     public void run(@NotNull ProgressIndicator indicator) {
-        WasmService wasmService = ApplicationManager.getApplication().getService(WasmService.class);
+        WasmService wasmService = project.getService(WasmService.class);
         var contractAddress = wasmService.deployWasmContract(network, wasmFile, signer, initMsg, fee, gas, fundList);
 
         if (contractAddress != null) {
             MessageBus messageBus = this.project.getMessageBus();
             WasmServiceListener publisher = messageBus.syncPublisher(WasmServiceListener.TOPIC);
-            publisher.deployWasmEvent(signer, contractAddress, network);
+            publisher.deployWasmEvent(project,signer, contractAddress, network);
         }
     }
 }

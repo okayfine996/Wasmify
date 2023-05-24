@@ -5,6 +5,7 @@ import com.github.okayfine996.wasmify.ui.contract.Network
 import com.github.okayfine996.wasmify.ui.network.AddNetworkDialog
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.openapi.ui.VerticalFlowLayout
 import com.intellij.ui.components.IconLabelButton
@@ -13,9 +14,11 @@ import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.panels.HorizontalLayout
 import java.awt.Toolkit
 
-class WasmToolWindowNetworkPanel(vertical: Boolean, borderless: Boolean) : SimpleToolWindowPanel(vertical, borderless) {
+class WasmToolWindowNetworkPanel(project: Project) : SimpleToolWindowPanel(true) {
+    val project: Project
+
     private val addNetwork = IconLabelButton(AllIcons.General.Add, {
-        val dialog = AddNetworkDialog()
+        val dialog = AddNetworkDialog(project)
         val dimension = Toolkit.getDefaultToolkit().screenSize
         val width = 600
         val height = 300
@@ -26,9 +29,12 @@ class WasmToolWindowNetworkPanel(vertical: Boolean, borderless: Boolean) : Simpl
 
     var container = JBPanel<JBPanel<*>>(VerticalFlowLayout())
 
-    private val wasmService = ApplicationManager.getApplication().getService(WasmService::class.java);
+    private val wasmService:WasmService
 
     init {
+        this.project = project
+        wasmService = project.getService(WasmService::class.java);
+
         toolbar = JBPanel<JBPanel<*>>().apply {
             layout = HorizontalLayout(10)
             add(addNetwork)
