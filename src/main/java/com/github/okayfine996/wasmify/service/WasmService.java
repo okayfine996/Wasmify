@@ -123,6 +123,10 @@ public final class WasmService implements PersistentStateComponent<WasmService.W
         this.wasmState.networkMap.put(network.getName(), network);
     }
 
+    public Network getNetwork(String name) {
+        return this.wasmState.networkMap.get(name);
+    }
+
     public void removeNetwork(String network) {
         this.wasmState.networkMap.remove(network);
     }

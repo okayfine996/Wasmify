@@ -21,8 +21,10 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
+import java.awt.*;
 import java.awt.event.*;
 import java.util.Collections;
+import java.util.function.Supplier;
 
 public class DeployWasmContractDialog extends JDialog {
     private JPanel contentPane;
@@ -39,6 +41,7 @@ public class DeployWasmContractDialog extends JDialog {
     private TextFieldWithBrowseButton wasmFileBrowseButton;
 
     private ExpandableTextField initMsgTextField;
+    private JBTextField feeTextField;
 
     private Project project;
     private String wasmFilePath;
@@ -95,6 +98,10 @@ public class DeployWasmContractDialog extends JDialog {
         String signer = this.signer.getComponent().getItem();
         String fee = this.feeLabel.getComponent().getText();
         String gas = this.gasLabel.getComponent().getNumber() + "";
+        if (StringUtil.isEmpty(network)||StringUtil.isEmpty(wasmFile)||StringUtil.isEmpty(initMsg)||StringUtil.isEmpty(signer)||StringUtil.isEmpty(fee)) {
+            return;
+        }
+
         ProgressManager.getInstance()
                 .run(new DeployWasmContractTask(project, network, wasmFile, initMsg, signer,fee,gas, null));
         dispose();
@@ -124,11 +131,17 @@ public class DeployWasmContractDialog extends JDialog {
 
 
         feeLabel = new LabeledComponent();
-        feeLabel.setComponent(new JBTextField());
+        feeTextField = new JBTextField();
+        feeTextField.setPreferredSize(new Dimension(100,30));
+        feeTextField.setMinimumSize(new Dimension(100,30));
+        feeLabel.setComponent(feeTextField);
 
         gasLabel = new LabeledComponent();
-        gasLabel.setComponent(new JBIntSpinner(200000, 21000,1000000000,10000));
-        denomLabel = new JBLabel("OKB");
+        JBIntSpinner gasSpinner = new JBIntSpinner(200000, 21000,1000000000,10000);
+        gasSpinner.setMinimumSize(new Dimension(100,30));
+        gasSpinner.setPreferredSize(new Dimension(100,30));
+        gasLabel.setComponent(gasSpinner);
+        denomLabel = new JBLabel("");
 
     }
 
@@ -137,7 +150,18 @@ public class DeployWasmContractDialog extends JDialog {
 
         String[] comboxItems = wasmService.getNetworkList().stream().map(com.github.okayfine996.wasmify.model.Network::getName).toArray(String[]::new);
         ComboBox<String> networkCombox = new ComboBox<>(comboxItems);
+        networkCombox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+
+                String denom = wasmService.getNetwork((String) e.getItem()).getDenom();
+                denomLabel.setText(denom);
+            }
+        });
         Network.setComponent(networkCombox);
+        if (comboxItems.length > 0) {
+            networkCombox.setSelectedItem(comboxItems[0]);
+        }
 
         wasmFileBrowseButton.setText(this.wasmFilePath);
 
@@ -149,7 +173,29 @@ public class DeployWasmContractDialog extends JDialog {
     }
 
     private void initValidator() {
-        new ComponentValidator(ProjectManager.getInstance().getDefaultProject()).withValidator(v -> {
+
+        new ComponentValidator(project).withValidator(new Supplier<ValidationInfo>() {
+            @Override
+            public ValidationInfo get() {
+                String str = feeTextField.getText();
+                if (StringUtil.isNotEmpty(str)) {
+                    try {
+                        Float.valueOf(str);
+                    }catch (Exception e) {
+                        return new ValidationInfo("invalid fee", feeTextField);
+                    }
+                }
+                return null;
+            }
+        }).installOn(feeTextField);
+        feeTextField.getDocument().addDocumentListener(new DocumentAdapter() {
+            @Override
+            protected void textChanged(@NotNull DocumentEvent e) {
+                ComponentValidator.getInstance(feeTextField).ifPresent(ComponentValidator::revalidate);
+            }
+        });
+
+        new ComponentValidator(project).withValidator(v -> {
             String str = initMsgTextField.getText();
             if (StringUtil.isNotEmpty(str)) {
                 if (!JSON.isValidObject(str)) {
@@ -164,7 +210,7 @@ public class DeployWasmContractDialog extends JDialog {
         initMsgTextField.getDocument().addDocumentListener(new DocumentAdapter() {
             @Override
             protected void textChanged(@NotNull DocumentEvent e) {
-                ComponentValidator.getInstance(initMsgTextField).ifPresent(v -> v.revalidate());
+                ComponentValidator.getInstance(initMsgTextField).ifPresent(ComponentValidator::revalidate);
             }
         });
     }

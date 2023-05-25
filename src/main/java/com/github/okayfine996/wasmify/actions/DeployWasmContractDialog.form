@@ -112,32 +112,44 @@
               <text value="InitMsg"/>
             </properties>
           </component>
-          <component id="d0577" class="com.intellij.openapi.ui.LabeledComponent" binding="feeLabel" custom-create="true">
-            <constraints>
-              <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <labelLocation value="West"/>
-              <text value="Fee"/>
-            </properties>
-          </component>
           <component id="4c2bc" class="com.intellij.openapi.ui.LabeledComponent" binding="gasLabel" custom-create="true">
             <constraints>
               <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
+              <labelInsets top="0" left="0" bottom="0" right="12"/>
               <labelLocation value="West"/>
               <text value="GasLimit"/>
             </properties>
           </component>
-          <component id="f8a92" class="com.intellij.ui.components.JBLabel" binding="denomLabel" custom-create="true">
+          <grid id="3a4b8" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+            <margin top="0" left="0" bottom="0" right="0"/>
             <constraints>
-              <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="2" indent="0" use-parent-layout="false"/>
             </constraints>
-            <properties>
-              <text value="OKB"/>
-            </properties>
-          </component>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="d0577" class="com.intellij.openapi.ui.LabeledComponent" binding="feeLabel" custom-create="true">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <labelInsets top="0" left="0" bottom="0" right="44"/>
+                  <labelLocation value="West"/>
+                  <text value="Fee"/>
+                </properties>
+              </component>
+              <component id="f8a92" class="com.intellij.ui.components.JBLabel" binding="denomLabel" custom-create="true">
+                <constraints>
+                  <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value=""/>
+                </properties>
+              </component>
+            </children>
+          </grid>
         </children>
       </grid>
     </children>
