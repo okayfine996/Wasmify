@@ -3,17 +3,15 @@
     <id>com.github.okayfine996.wasmify</id>
     <name>Wasmify</name>
     <vendor>okayfine996</vendor>
-    <version>beta-0.0.1</version>
-    <idea-version since-build="221"/>
 
     <depends>com.intellij.modules.platform</depends>
-<!--    <depends>com.intellij.modules.java</depends>-->
     <depends>org.rust.lang</depends>
 
     <resource-bundle>messages.MyBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.okayfine996.wasmify.toolWindow.WasmToolWindowFactory" id="Wasmify" anchor="right"/>
+        <toolWindow factoryClass="com.github.okayfine996.wasmify.toolWindow.WasmToolWindowFactory" id="Wasmify"
+                    anchor="right"/>
         <framework.type implementation="com.github.okayfine996.wasmify.framework.WasmFramework">Wasm Contract
         </framework.type>
         <configurationType
@@ -27,8 +25,8 @@
 
         <moduleType id="COSMOS_WASM_MODULE_TYPE"
                     implementationClass="com.github.okayfine996.wasmify.module.CWModuleType"/>
-<!--        <stepsBeforeRunProvider-->
-<!--                implementation="com.github.okayfine996.wasmify.run.wasmbuild.configuration.WasmBuildTaskProvider"/>-->
+        <!--        <stepsBeforeRunProvider-->
+        <!--                implementation="com.github.okayfine996.wasmify.run.wasmbuild.configuration.WasmBuildTaskProvider"/>-->
 
         <projectService serviceImplementation="com.github.okayfine996.wasmify.service.WasmService"/>
         <notificationGroup displayType="BALLOON" id="WasmNotificationGroup" key="notification.group.name"/>
@@ -43,7 +41,7 @@
 
     <projectListeners>
         <listener class="com.github.okayfine996.wasmify.listener.MyWasmServiceListener"
-                topic="com.github.okayfine996.wasmify.listener.WasmServiceListener"/>
+                  topic="com.github.okayfine996.wasmify.listener.WasmServiceListener"/>
     </projectListeners>
     <actions>
         <action id="com.github.okayfine996.wasmify.actions.DeployWasmContractAction"
@@ -54,5 +52,4 @@
     </actions>
 
 
-    
 </idea-plugin>
