@@ -2,11 +2,8 @@ package com.github.okayfine996.wasmify.ui.signer;
 
 import com.github.okayfine996.wasmify.notify.Notifier;
 import com.github.okayfine996.wasmify.service.WasmService;
-import com.github.okayfine996.wasmify.toolWindow.WasmToolWindowFactory;
 import com.github.okayfine996.wasmify.toolWindow.WasmToolWindowSignerPanel;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.ComponentValidator;
 import com.intellij.openapi.ui.LabeledComponent;
 import com.intellij.openapi.ui.ValidationInfo;
@@ -46,20 +43,19 @@ public class AddSignerDialog extends JDialog {
         getRootPane().setDefaultButton(buttonOK);
 
 
-        new ComponentValidator(ProjectManager.getInstance().getDefaultProject()).withValidator(v -> {
+        new ComponentValidator(project).withValidator(()-> {
             String str = valueFiled.getText();
             if (StringUtil.isNotEmpty(str)) {
                 if (!isVaildPrivateKeyOrMnemonic(str)){
-                    v.updateInfo(new ValidationInfo("invalid privateKey or mnemonic", valueFiled));
+                    return new ValidationInfo("invalid privateKey or mnemonic", valueFiled);
                 }
-            } else {
-                v.updateInfo(null);
             }
+            return null;
         }).installOn(valueFiled);
         valueFiled.getDocument().addDocumentListener(new DocumentAdapter() {
             @Override
             protected void textChanged(@NotNull DocumentEvent e) {
-                ComponentValidator.getInstance(valueFiled).ifPresent(v -> v.revalidate());
+                ComponentValidator.getInstance(valueFiled).ifPresent(ComponentValidator::revalidate);
             }
         });
 

@@ -199,17 +199,14 @@ public class WasmContract {
     }
 
     private void initValidator() {
-        new ComponentValidator(ProjectManager.getInstance().getDefaultProject()).withValidator(v -> {
+        new ComponentValidator(ProjectManager.getInstance().getDefaultProject()).withValidator(() -> {
             String str = excuteMsgTextField.getText();
             if (StringUtil.isNotEmpty(str)) {
                 if (!JSON.isValidObject(str)) {
-                    v.updateInfo(new ValidationInfo("invalid json", excuteMsgTextField));
-                }else {
-                    v.updateInfo(null);
+                    return new ValidationInfo("invalid json", excuteMsgTextField);
                 }
-            } else {
-                v.updateInfo(null);
             }
+            return null;
         }).installOn(excuteMsgTextField);
         excuteMsgTextField.getDocument().addDocumentListener(new DocumentAdapter() {
             @Override

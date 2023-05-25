@@ -4,6 +4,10 @@
     <name>Wasmify</name>
     <vendor>okayfine996</vendor>
 
+    <description>
+        This Fancy IntelliJ Platform Plugin is going to be your Wasm contract development environment.
+        With this plugin you can scaffold a template smart contract app development and dramatically simplify the development and deployment process.
+    </description>
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.java</depends>
     <depends>org.rust.lang</depends>

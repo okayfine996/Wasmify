@@ -53,7 +53,6 @@ public class DeployWasmContractDialog extends JDialog {
         this.wasmFileBrowseButton.setText(wasmFilePath);
 
 
-
         initView();
 
         setContentPane(contentPane);
@@ -98,12 +97,11 @@ public class DeployWasmContractDialog extends JDialog {
         String signer = this.signer.getComponent().getItem();
         String fee = this.feeLabel.getComponent().getText();
         String gas = this.gasLabel.getComponent().getNumber() + "";
-        if (StringUtil.isEmpty(network)||StringUtil.isEmpty(wasmFile)||StringUtil.isEmpty(initMsg)||StringUtil.isEmpty(signer)||StringUtil.isEmpty(fee)) {
+        if (StringUtil.isEmpty(network) || StringUtil.isEmpty(wasmFile) || StringUtil.isEmpty(initMsg) || StringUtil.isEmpty(signer) || StringUtil.isEmpty(fee)) {
             return;
         }
 
-        ProgressManager.getInstance()
-                .run(new DeployWasmContractTask(project, network, wasmFile, initMsg, signer,fee,gas, null));
+        ProgressManager.getInstance().run(new DeployWasmContractTask(project, network, wasmFile, initMsg, signer, fee, gas, null));
         dispose();
     }
 
@@ -132,14 +130,14 @@ public class DeployWasmContractDialog extends JDialog {
 
         feeLabel = new LabeledComponent();
         feeTextField = new JBTextField();
-        feeTextField.setPreferredSize(new Dimension(100,30));
-        feeTextField.setMinimumSize(new Dimension(100,30));
+        feeTextField.setPreferredSize(new Dimension(100, 30));
+        feeTextField.setMinimumSize(new Dimension(100, 30));
         feeLabel.setComponent(feeTextField);
 
         gasLabel = new LabeledComponent();
-        JBIntSpinner gasSpinner = new JBIntSpinner(200000, 21000,1000000000,10000);
-        gasSpinner.setMinimumSize(new Dimension(100,30));
-        gasSpinner.setPreferredSize(new Dimension(100,30));
+        JBIntSpinner gasSpinner = new JBIntSpinner(200000, 21000, 1000000000, 10000);
+        gasSpinner.setMinimumSize(new Dimension(100, 30));
+        gasSpinner.setPreferredSize(new Dimension(100, 30));
         gasLabel.setComponent(gasSpinner);
         denomLabel = new JBLabel("");
 
@@ -181,7 +179,7 @@ public class DeployWasmContractDialog extends JDialog {
                 if (StringUtil.isNotEmpty(str)) {
                     try {
                         Float.valueOf(str);
-                    }catch (Exception e) {
+                    } catch (Exception e) {
                         return new ValidationInfo("invalid fee", feeTextField);
                     }
                 }
@@ -195,17 +193,14 @@ public class DeployWasmContractDialog extends JDialog {
             }
         });
 
-        new ComponentValidator(project).withValidator(v -> {
+        new ComponentValidator(project).withValidator(() -> {
             String str = initMsgTextField.getText();
             if (StringUtil.isNotEmpty(str)) {
                 if (!JSON.isValidObject(str)) {
-                    v.updateInfo(new ValidationInfo("invalid json", initMsgTextField));
-                }else {
-                    v.updateInfo(null);
+                    return new ValidationInfo("invalid json", initMsgTextField);
                 }
-            } else {
-                v.updateInfo(null);
             }
+            return null;
         }).installOn(initMsgTextField);
         initMsgTextField.getDocument().addDocumentListener(new DocumentAdapter() {
             @Override
