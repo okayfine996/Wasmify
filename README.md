@@ -1,12 +1,12 @@
 # Wasmify
 
 ![Build](https://github.com/okayfine996/Wasmify/workflows/Build/badge.svg)
-[![Version](https://img.shields.io/jetbrains/plugin/v/com.github.okayfine996.wasmify.svg)](https://plugins.jetbrains.com/plugin/com.github.okayfine996.wasmify)
-[![Downloads](https://img.shields.io/jetbrains/plugin/d/com.github.okayfine996.wasmify.svg)](https://plugins.jetbrains.com/plugin/com.github.okayfine996.wasmify)
+[![Version](https://img.shields.io/jetbrains/plugin/v/com.github.okayfine996.wasmify.svg)](https://plugins.jetbrains.com/plugin/21878-wasmify/versions)
+[![Downloads](https://img.shields.io/jetbrains/plugin/d/com.github.okayfine996.wasmify.svg)](https://plugins.jetbrains.com/files/21878/340205/Wasmify-0.0.1.zip?updateId=340205&pluginId=21878&family=INTELLIJ)
 
 <!-- Plugin description -->
-This Fancy IntelliJ Platform Plugin is going to be your Wasm contract development environment.
-With this plugin you can scaffold a template smart contract app development and dramatically simplify the development and deployment process.
+Wasmify is a Wasm contract development environment. With this plugin you can scaffold a template smart contract app development and dramatically simplify the development and deployment process.
+Visualization support for contract deployment, contract interaction, contract query and contract migrate.
 <!-- Plugin description end -->
 
 ## Installation
