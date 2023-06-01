@@ -79,7 +79,7 @@ public class CWModuleWizardStep extends ModuleWizardStep {
     public boolean checkInstallCargoGenerate() {
         int code = -1;
         try {
-            code = Runtime.getRuntime().exec(new String[]{"cargo", "generate", "-V"}).waitFor();
+            code = Runtime.getRuntime().exec(new String[]{System.getProperty("user.home")+"/.cargo/bin/cargo", "generate", "-V"}).waitFor();
         } catch (Exception e) {
             e.printStackTrace();
         }

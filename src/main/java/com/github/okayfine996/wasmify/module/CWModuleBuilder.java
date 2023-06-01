@@ -51,28 +51,11 @@ public class CWModuleBuilder extends ModuleBuilder {
         return cwModuleWizardStep;
     }
 
-
-    public boolean checkInstallCargoGenerate() {
-        int code = -1;
-        try {
-            code = Runtime.getRuntime().exec(new String[]{"cargo", "generate", "-V"}).waitFor();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return code == 0;
-    }
-
-
-
-
-
-
     @Override
     public void setupRootModel(@NotNull ModifiableRootModel modifiableRootModel) throws ConfigurationException {
         VirtualFile root = doAddContentEntry(modifiableRootModel).getFile();
         String name = modifiableRootModel.getProject().getName();
-        String[] command = new String[]{"cargo", "generate", "--git", "https://gitee.com/tainrandai/cw-template.git", "--name", name,"-d","minimal=false","--init"};
+        String[] command = new String[]{System.getProperty("user.home")+"/.cargo/bin/cargo", "generate", "--git", "https://gitee.com/tainrandai/cw-template.git", "--name", name,"-d","minimal=false","--init"};
         GeneralCommandLine commandLine = new GeneralCommandLine(command);
         commandLine.setWorkDirectory(root.getPath());
 

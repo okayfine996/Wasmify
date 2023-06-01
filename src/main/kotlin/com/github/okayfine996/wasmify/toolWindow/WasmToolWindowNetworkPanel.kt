@@ -24,7 +24,7 @@ class WasmToolWindowNetworkPanel(project: Project) : SimpleToolWindowPanel(true)
         val height = 300
         dialog.setBounds((dimension.width - width) / 2, (dimension.height - height) / 2, width, height)
         dialog.pack()
-        dialog.show()
+        dialog.isVisible = true
     })
 
     var container = JBPanel<JBPanel<*>>(VerticalFlowLayout())

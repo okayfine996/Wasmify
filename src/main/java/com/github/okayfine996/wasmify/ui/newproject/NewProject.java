@@ -8,6 +8,7 @@ import com.intellij.ui.components.ActionLink;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.io.IOException;
 
 public class NewProject {
     private JPanel createUI;
@@ -33,18 +34,24 @@ public class NewProject {
                 @Override
                 public void run(@NotNull ProgressIndicator indicator) {
                     indicator.setIndeterminate(true);
-                    GeneralCommandLine commandLine = new GeneralCommandLine("cargo", "install", "cargo-generate");
+//                    RsMacToolchainFlavor
+
+//                    GeneralCommandLine commandLine = new GeneralCommandLine("cargo", "install", "cargo-generate");
+
+//                    commandLine.setExePath("~/.cargo/bin/cargo");
                     try {
-                        Process process = commandLine.createProcess();
+
+
+                        Process process =  Runtime.getRuntime().exec(System.getProperty("user.home")+"/.cargo/bin/cargo",new String[]{"install", "cargo-generate"});
                         int code = process.waitFor();
                         if (code == 0) {
                             installLink.setVisible(false);
                         }else  {
                             throw new RuntimeException("install failed " + code);
                         }
-                    } catch (ExecutionException e) {
+                    }  catch (InterruptedException e) {
                         throw new RuntimeException(e);
-                    } catch (InterruptedException e) {
+                    } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
                 }
@@ -59,7 +66,7 @@ public class NewProject {
     private boolean checkInstallCargoGenerate() {
         int code = -1;
         try {
-            code = Runtime.getRuntime().exec(new String[]{"cargo", "generate", "-V"}).waitFor();
+            code = Runtime.getRuntime().exec(new String[]{System.getProperty("user.home")+"/.cargo/bin/cargo", "generate", "-V"}).waitFor();
         } catch (Exception e) {
             e.printStackTrace();
         }
